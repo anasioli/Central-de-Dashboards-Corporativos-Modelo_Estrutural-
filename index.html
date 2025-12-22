@@ -1,0 +1,2686 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Controles Gerais - Control Tower</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- favicon padrão -->
+<link rel="icon" href="https://i.ibb.co/0yQDG7QG/image.png">
+<link rel="icon" href="https://i.ibb.co/0yQDG7QG/image.png">
+<!-- fallback / IE -->
+<link rel="shortcut icon" href="https://i.ibb.co/0yQDG7QG/image.png">
+
+    <style>
+
+
+
+/* ===== Fav popover na modern-navbar ===== */
+.modern-navbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;                /* altura recolhida */
+  display: flex;
+  align-items: center;
+  justify-content: center;     /* centraliza o "pill" no topo */
+  padding: 8px 12px;
+  z-index: 200;
+  pointer-events: none;        /* container geral não captura cliques; items sim */
+  transition: height 240ms cubic-bezier(.2,.8,.2,1), box-shadow 240ms;
+  background: transparent;     /* transparente por padrão (header já tem cor) */
+}
+.nav-item[data-action="favorites"] { position: relative; }
+
+.nav-item[data-action="favorites"] .fav-badge {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f10a0a;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* Popover */
+.fav-popover {
+  position: fixed;
+  right: 20px;                /* distância da borda direita */
+  top: 84px;                  /* um pouco abaixo do topo / navbar expandida */
+  width: 360px;
+  max-width: calc(100vw - 40px);
+  background: linear-gradient(180deg, #101113, #0b0b0c);
+  color: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 24px 48px rgba(3,6,12,0.6);
+  z-index: 9999;
+  border: 1px solid rgba(255,255,255,0.04);
+  display: none;
+  transform: none;            /* não usar translate que assumia posicionamento relativo */
+}
+
+/* mostragem */
+.fav-popover.open { display: block; }
+
+.fav-popover .header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom: 8px;
+}
+.fav-popover .header h4 { margin:0; font-size:14px; font-weight:700; color:#fff; }
+
+.fav-list { display:flex; flex-direction:column; gap:8px; max-height: 260px; overflow: auto; padding-right: 4px; }
+.fav-item { display:flex; gap:10px; align-items:center; padding:8px; border-radius:10px; cursor:pointer; transition: background .12s; }
+.fav-item:hover { background: rgba(255,255,255,0.03); }
+.fav-item .thumb { width:44px; height:44px; border-radius:8px; background:#111; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border: 1px solid rgba(255,255,255,0.03); }
+.fav-item .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.fav-item .meta { display:flex; flex-direction:column; }
+.fav-item .meta .title { font-size:13px; font-weight:700; color:#fff; }
+.fav-item .meta .sub { font-size:12px; color:#cfcfd3; }
+
+.fav-popover .empty { padding: 12px; text-align:center; color:#cfcfd3; font-size:13px; }
+
+
+        /* Estilos Globais e de Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f0f2f5; /* Cor de fundo levemente cinza para destacar a barra */
+            color: #222;
+            padding-bottom: 70px; /* Espaço para a navbar fixa na parte inferior */
+               font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* cor de fundo de fallback */
+    background-color: #f0f2f5;
+    /* imagem de fundo principal com overlay para legibilidade */
+    background-image:
+      linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
+      url("https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ODY1aWk2ZDN0amFxZHVsYTZlYnFleHllZWVubnp0OHBhajlmcnM2ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xTiTnJx84dFZitpX2g/giphy.gif");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;           /* cobre toda a viewport */
+    background-attachment: fixed;     /* fixa a imagem enquanto a página rola */
+    color: #222;
+    padding-bottom: 70px; /* Espaço para a navbar fixa na parte inferior */
+        }
+
+
+        
+.tool-card-icon-wrapper { position: relative; }
+.fav-btn{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:none;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: transform .12s ease, background .12s ease;
+  z-index: 5;
+}
+.fav-btn:active{ transform: scale(.96); }
+.fav-btn.active{ background: linear-gradient(180deg,#f0fa64,#ff9400); color: #111; }
+
+.demand-footer {
+  text-align: center;
+  padding-top: 3rem;
+  border-top: 1px solid #eee;
+  margin-top: 2rem;
+}
+.demand-footer h2 { margin-bottom: 0.6rem; color: #0d0e0d; }
+.demand-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #222;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 6px;
+}
+.demand-btn:active { transform: translateY(1px); }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Classes de utilidade para o JavaScript */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Estilo para a Section ativa (para tela cheia no estilo da imagem) */
+        .page-container {
+            min-height: calc(100vh - 70px); /* Ocupa a altura restante da tela */
+        }
+        
+        /* ====== TOPO / HEADER (Mantido o seu estilo original) ====== */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: #101113;
+            color: orange;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.1rem 2.0rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-area img {
+            width: 50px;
+            height: 60px;
+            border-radius: 8px;
+        }
+
+
+        .logo-text-main {
+            font-weight: 790;
+            letter-spacing: 0.10em;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        header nav {
+            display: none;
+        }
+        
+       @media (max-width: 768px) {
+            .header-inner {
+                padding: 0.1rem 1rem;
+            }
+        }
+.modern-navbar .fab { display: none !important; }
+        .modern-navbar {
+            position: fixed;
+            bottom: 30px;
+            left: 70%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            pointer-events: none; /* evita problemas com overlays; itens individuais habilitam pointer-events */
+        }
+
+        
+        /* O "pill" escuro que contém os itens */
+        .modern-navbar .nav-pill {
+            pointer-events: auto;
+            background: linear-gradient(180deg,#101113,#101113);
+            color: #fff;
+            border-radius: 999px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 8px 20px rgba(2,6,23,0.45);
+            border: #101113;
+            min-width: 260px;
+            max-width: 420px;
+        }
+
+        /* Cada item dentro do pill */
+.modern-navbar .nav-item {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #cfcfd3;
+  font-weight: 600;
+  background: #ffffff1f;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+        /* Ícone dentro do item */
+        .modern-navbar .nav-item .icon {
+            font-size: 1.30rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Label (texto) - visível apenas no item ativo */
+        .modern-navbar .nav-item .label {
+            font-size: 0.95rem;
+            display: inline-block;
+            opacity: 0;
+            transform: translateX(-6px);
+            transition: opacity .18s ease, transform .18s ease;
+            white-space: nowrap;
+        }
+
+        /* Estado ativo: chip claro (parecido com a imagem) */
+        .modern-navbar .nav-item.active {
+            background: linear-gradient(180deg,#f0fa64,#f0fa64);
+            color: #0a0909;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+            transform: translateY(-2px);
+        }
+
+        /* Ao ativar, mostra o label */
+        .modern-navbar .nav-item.active .label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Itens não ativos: reduz opacidade dos labels */
+        .modern-navbar .nav-item:not(.active) .icon { color: #f0fa64; }
+
+        /* FAB laranja no lado direito */
+        .modern-navbar .fab {
+            pointer-events: auto;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(180deg,#ff7b00,#ff5c00);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(255,92,0,0.24);
+            border: 5px solid rgba(166, 248, 15, 0.06);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform .15s ease;
+        }
+
+        /* Pressing effect FAB */
+        .modern-navbar .fab:active { transform: scale(.96); }
+
+        /* Mobile adjustments */
+        @media (max-width: 420px) {
+            .modern-navbar { gap: 8px; bottom: 14px; }
+            .modern-navbar .nav-pill { min-width: 200px; padding: 6px; }
+            .modern-navbar .nav-item { padding: 6px 8px; }
+        }
+
+        /* Conteúdo em geral (Mantido o seu CSS original, apenas reorganizado) */
+        /* ... outros estilos mantidos ... */
+        
+        /* ====== BANNER SUPERIOR ====== */
+
+        .hero {
+            height: 200px;
+            background: url("https://img.freepik.com/vetores-gratis/plano-de-fundo-da-area-de-trabalho-moderno-vetor-de-desenho-geometrico-azul_53876-135923.jpg")
+                center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 4px 4px rgba(0, 0, 0, 0.7);
+            
+        }
+        
+        .hero h1 {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+/* === Background específico para a aba "Home" (#idea-content) === */
+#idea-content {
+  /* garante que a seção cubra a viewport para que o background da foto seja visível */
+  min-height: 100vh;
+
+  /* ajuste visual: overlay para legibilidade do texto (opcional) */
+  background-image:
+    linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+    url("https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bHhwa2J0OWRjcHEyZDkxbWxpbmw1NDZ3c3Ryb3pqOTY1MTZwd2s1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o85xCMrjIbG6F18xq/giphy.gifhttps://img.freepik.com/vetores-gratis/fundo-monocromatico-branco-estilo-papel_23-2149009214.jpg?semt=ais_hybrid&w=740&q=80"); /* <- substitua pela sua foto (jpg/png/webp) */
+
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;   /* cover para preencher a área */
+  background-attachment: fixed; /* opcional: fixa a foto ao scroll */
+  color: #222;              /* cor do texto sobre a foto (ajuste se necessário) */
+  padding-top: 1.2rem;      /* conserva espaçamento existente */
+  box-sizing: border-box;
+}
+.dual-bg {
+  /* garante que a seção cubra a viewport quando necessário */
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: #222;
+
+  /* ordem: primeiro layer é desenhado por cima -> overlay, depois photo, por fim gif de fundo */
+  background-image:
+    linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), /* overlay para legibilidade */
+    var(--bg-photo, none),   /* foto específica da aba (p.ex. url('/img/home.jpg')) */
+    var(--bg-gif, none);     /* gif de fundo compartilhado (p.ex. url('...gif')) */
+
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: center center, center center, center center;
+  background-size: cover, cover, cover;
+  /* fixa o GIF por padrão, mas permite que a foto role (ajuste abaixo para mobile) */
+  background-attachment: scroll, scroll, fixed;
+
+  padding-top: 1.2rem;
+}
+
+/* fallback se a seção não precisa ocupar 100vh: deixe min-height menor (opcional) */
+.dual-bg.inline {
+  min-height: auto;
+}
+
+/* Mobile: evitar background-attachment: fixed por problemas em iOS/Android */
+@media (max-width: 768px) {
+  .dual-bg {
+    background-attachment: scroll, scroll, scroll;
+    background-position: top center, top center, top center;
+  }
+}
+
+/* quando a tela for pequena, ajuste a altura para não quebrar o layout */
+@media (max-width: 768px) {
+  #idea-content {
+    min-height: auto;
+    background-attachment: scroll;
+    background-position: top center;
+  }
+}
+
+        /* ====== FAIXA VERDE ====== */
+
+        .section-bar {
+            background: #f0fa64;
+            text-align: center;
+            padding: 0.65rem 1rem;
+            color: #050505;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .idea-content-wrapper .section-bar {
+            border-radius: 20px; 
+            color: #222;
+        }
+        .idea-content-wrapper .section-bar:first-of-type {
+            background: #41B96F;
+        }
+        .idea-content-wrapper .section-bar:nth-of-type(2) {
+            background: #ffb300; 
+        }
+        .idea-content-wrapper .section-bar:last-of-type {
+            background: #41B96F;
+        }
+
+
+        /* ====== GRID DE ÍCONES (Controles) ====== */
+
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 2.5rem 2rem;
+            justify-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .tool-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .tool-card:active {
+            transform: translateY(0);
+        }
+
+        
+        .tool-card-icon {
+            width: 105px;
+            height: 105px;
+            border-radius: 20px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .tool-card-img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .tool-card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .tool-card-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #646464;
+        }
+
+        /* ====== FILTRO ====== */
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.8rem;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+
+        .filter-btn {
+            border-radius: 999px;
+            color: #0c0c0c;
+            border-color: #ee0a0a;
+            border: 1px solid #0c0c0c;
+            padding: 0.3rem 0.8rem;
+            background: #ffffff;
+            cursor: pointer;
+            transition: background 0.15s ease-out, border-color 0.15s ease-out;
+        }
+
+        .filter-btn.active {
+            background: #f0fa64;
+            border-color: #f0fa64;
+            color: #020202;
+            font-weight: 600;
+        }
+
+        /* ====== CONTEÚDO ID/EA====== */
+        .idea-content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .idea-content-wrapper h2 {
+            font-size: 1.8rem;
+            color: #0a0a0a;
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .idea-content-wrapper p, .idea-content-wrapper ul {
+            max-width: 800px;
+            margin: 1rem auto;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .idea-content-wrapper ul {
+            text-align: left;
+            list-style: inside;
+        }
+        
+        /* Estilos da Hierarquia */
+        .team-section {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .team-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .team-section h3 {
+            text-align: center;
+            color: #444;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .team-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        .team-member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 150px;
+        }
+
+        .team-member img {
+            width: 120px; 
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f0fa64;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member p {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .team-member small {
+            font-size: 0.75rem;
+            color: #777;
+        }
+        
+        .tbd-member .team-member-details {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #aaa;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tbd-member .tbd-icon {
+            width: 50px; 
+            height: 50px;
+            opacity: 0.5;
+        }
+
+
+        /* ====== RESPONSIVO ====== */
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 90px;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .header-inner {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            header nav {
+                display: none; 
+            }
+            .team-row {
+                gap: 1rem;
+            }
+            .team-member {
+                width: 120px; 
+            }
+            .p {font-size: 1.85rem;
+             color: #0b0b0b;   
+        }
+    }
+        /* --- Texto (label) das abas INATIVAS */
+.modern-navbar .nav-item:not(.active) .label {
+  color: #cbcbd6;      /* cor do texto inativo — ajuste para o hex que quiser */
+  opacity: 0.95;       /* se quiser que o label esteja visível (por padrão é 0) */
+  transform: translateX(0); /* opcional: remove o deslocamento se desejar */
+}
+
+/* --- Ícone das abas INATIVAS (separado) */
+.modern-navbar .nav-item:not(.active) .icon {
+  color: #f0fa64;      /* cor do ícone inativo — já tem na sua folha, manter/alterar aqui */
+}
+
+/* --- Garante cor desejada para o item ativo (texto + ícone) */
+.modern-navbar .nav-item.active,
+.modern-navbar .nav-item.active .label,
+.modern-navbar .nav-item.active .icon {
+  color: #0a0909;      /* cor atual que você usa para o estado ativo */
+}
+
+/* Se regras existentes estiverem com mais especificidade use !important (usar somente se necessário) */
+/* .modern-navbar .nav-item:not(.active) .label { color: #cfcfd3 !important; } */
+
+    </style>
+    
+</head>
+
+<body>
+    
+    <header>
+        <div class="header-inner">
+            <a class="logo-area" href="#idea">
+                <img src="https://i.ibb.co/0yQDG7QG/image.png" alt="image">
+                <div class="logo-text">
+                    <div class="logo-text-main blank animated">Site Teste</div>
+                </div>
+            </a>
+
+            </div>
+    </header>
+    
+    <div class="page-container">
+        <section id="idea-content" class="idea-content-wrapper">
+            
+            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">O que é Control Tower?</div>
+
+            <p>A torre de controle é uma biblioteca criada pela área de ID/EA (Inteligente Data & Execution Analysis), que é responsável por realizar, analisar e desenvolver ferramentas de controle para melhores resultados operacionais. Aqui você encontrará todas as ferramentas desenvolvidas por ID/EA separadas por área, você pode encontrá-las na parte superior direita desse site (ou superior esquerdo para celular).</p>
+
+            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">O que o time de LMS faz?</div>
+
+            <p>O time de LMS é responsável pela gestão operacional de pessoas e capacidade, garantindo o equilíbrio entre demanda, produtividade e disponibilidade das equipes. Atua diretamente no controle e análise de HC (headcount), movimentações de pessoas (entradas e desligamentos), absenteísmo (ABS) e demais indicadores de força de trabalho.<br>
+
+</p>
+
+
+            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">Qual é o nosso objetivo?</div>
+
+            <p>O nosso objetivo é fornecer dados operacionais em tempo real através de várias ferramentas criadas por nós mesmos de forma simplificada para melhorar a eficiência da operação, identificando lacunas de melhorias tanto na produtividade quanto no desempenho. Além disso, ajudamos a elaborar planos de ação caso algum indicador se desvie dos padrões esperados. Sendo os principais focos:</p>
+            
+            <ul style="max-width: 800px; margin: 1rem auto; text-align: left;">
+                <li>Padronizar o controle de KPI.</li>
+                <li>Desenvolver um conjunto de ferramentas padrão, específicas para Execução de Operações, que garantam o controle do caminho crítico para um OBMP excelente.</li>
+                <li>Criar ferramentas que permitam que as equipes auto avaliem o OBMP, tendo nosso apoio na criação de plano de ação para melhorá-lo.</li>
+                <li>Gerar tomadas de decisões mais assertivas, através do controle hora a hora dos KPIs.</li>
+                <li>Melhorar o desempenho operacional com a criação de novos KPIs.</li>
+            </ul>
+
+            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">Nosso time:</div>
+
+            <div class="idea-team-wrapper">
+                
+                <div class="team-section">
+                    <h3 style="margin-top: 0;">Gerente e Supervisor</h3>
+                    <div class="team-row">
+                        <div class="team-member">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>Manager</small>
+                        </div>
+                        <div class="team-member">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>Supervisor</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h3>Team Leader e Analista</h3>
+                    <div class="team-row">
+                        <div class="team-member">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>Team Leader Sr</small>
+                        </div>
+                        <div class="team-member">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>Analista SSR</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h3>Assistentes</h3>
+                    <div class="team-row">
+                        
+                        <div class="team-member"
+                        data-name="Nome aqui"
+                        data-role="T1 - ID/EA Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets">
+                        <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T1 - ID/EA Assistant</small>
+                        </div>
+
+                        
+                        <div class="team-member"
+                        data-name="Nome aqui"
+                         data-role="T1 - LMS Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T1 - LMS Assistant</small>
+
+
+                        </div>
+                        <div class="team-member"
+                        data-name="Nome aqui"
+                         data-role="T1 - ID/EA Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets"
+
+                        >
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T1 - ID/EA Assistant</small>
+                        </div>
+
+
+                        <div class="team-member"
+                            data-name="Nome aqui"
+                            data-role="T2 - ID/EA Assistant"
+                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                            data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, HTML/CSS/JS para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                            data-tools="BigQuery, Looker Studio, Google Sheets, HTML, CSS, JavaScript, Python, R, C#, Appscript">
+                        <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                        <p>Nome aqui</p>
+                        <small>T2 - ID/EA Assistant</small>
+                        </div>
+
+
+                        <div class="team-member"
+                             data-name="Nome aqui"
+                            data-role="T2 - ID/EA Assistant"
+                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                            data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                            data-tools="BigQuery, Looker Studio, Google Sheets, Python"
+                            >
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T2 - ID/EA Assistant</small>
+                        </div>
+
+
+                        <div class="team-member"
+                            data-name="Nome aqui"
+                            data-role="T2 - LMS Assistant"
+                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                            data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, HTML/CSS/JS e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                            data-tools="BigQuery, Looker Studio, Google Sheets, Python, HTML, CSS, JavaScript, Appscript">
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T2 - LMS Assistant</small>
+                        </div>
+                        
+
+
+                        <div class="team-member"
+                         data-name="Nome aqui"
+                         data-role="T3 - ID/EA Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets"
+                            >
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T3 - ID/EA Assistant</small>
+                        </div>
+
+
+                        <div class="team-member"
+                         data-name="Nome aqui"
+                         data-role="T3 - ID/EA Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets"
+                        >
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T3 - ID/EA Assistant</small>
+                        </div>
+
+
+                        <div class="team-member"
+                         data-name="Nome aqui"
+                         data-role="T3 - LMS Assistant"
+                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
+                        data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
+                        data-tools="BigQuery, Looker Studio, Google Sheets"
+                        >
+                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
+                            <p>Nome aqui</p>
+                            <small>T3 - LMS Assistant</small>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="demand-footer">
+                <h2>Dúvidas ou Sugestões?</h2>
+                <div style="margin-top: 1rem;">
+                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                </div>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+            </div>
+        </section>
+
+        <section id="outros-content" class="hidden"> 
+            
+            <section class="hero">
+                <h1>OUTROS</h1>
+            </section>
+            
+            <div class="section-bar">ÁREA DE SUPORTE</div>
+
+
+            <main class="page-wrapper">
+                
+                <section class="card-grid" id="icqaGrid">
+                    
+                    <article class="tool-card" data-category="ICQA" data-name="DASH 1">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 1">
+                            </div>
+                            
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 1</a>
+                        </div>
+                        <div class="tool-card-category">Categoria do Dash 1</div>
+                    </article>
+
+                    <article class="tool-card" data-category="ICQA" data-name="DASH 2">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 2">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 2</a>
+                        </div>
+                        <div class="tool-card-category">Categoria do Dash 2</div>
+                    </article>
+
+                    <article class="tool-card" data-category="ICQA" data-name="DASH 3">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 3">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 3</a>
+                        </div>
+                        <div class="tool-card-category">Categoria do Dash 3</div>
+                    </article>
+
+                    <article class="tool-card" data-category="ICQA" data-name="DASH 4">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 4">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 4</a>
+                        </div>
+                        <div class="tool-card-category">Categoria do Dash 4</div>
+                    </article>
+                    
+                </section>
+            </main>
+
+            <!-- Inclusão do rodapé de Dúvidas ou Sugestões nesta aba -->
+            <div class="demand-footer">
+                <h2>Dúvidas ou Sugestões?</h2>
+                <div style="margin-top: 1rem;">
+                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                </div>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+            </div>
+
+        </section>
+
+        <section id="controles-content" class="hidden"> 
+            <section class="hero">
+                <h1>Controles Gerais</h1>
+            </section>
+
+            <div class="section-bar">CONTROLES</div>
+
+            <main class="page-wrapper">
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="Categoria 2">Categoria 2</button>
+                    <button class="filter-btn" data-filter="Categoria 3">Categoria 3</button>
+                    <button class="filter-btn" data-filter="Categoria 4">Categoria 4</button>
+                    <button class="filter-btn" data-filter="Categoria 5">Categoria 5</button>
+                    <button class="filter-btn" data-filter="Categoria 6">Categoria 6</button>
+                    <button class="filter-btn" data-filter="Categoria 7">Categoria 7</button>
+                    <button class="filter-btn" data-filter="Categoria 8">Categoria 8</button>
+                    <button class="filter-btn" data-filter="Categoria 9">Categoria 9</button>
+                </div>
+
+                <section class="card-grid" id="toolGrid">
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 5">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 5">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 5</a>
+                        </div>
+                        <div class="tool-card-category">Categoria dash 5</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 6">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 6">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 6
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 6</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 7">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 7">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 7
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 7</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 8">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 8">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 8
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 8</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 9">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 9">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 9
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 9</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 10">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 10">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 10</a>
+                        </div>
+                        <div class="tool-card-category">DASH 10</div>
+                    </article>
+
+
+                    
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 11">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 11">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 11
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 11</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 12">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 12">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 12
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 12</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 13">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 13">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 13
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 13</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 14">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 14">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 14
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 14</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 15">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 15">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 15
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 15</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 16">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 16">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 16
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 16</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 17">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 17">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 17
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 17</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 18">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 18">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 18
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 18</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 19">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 19">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 19
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 19</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 20">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 20">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 20
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 20</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 21">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 21">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 21
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 21</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 22">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 22">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 22
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 22</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 23">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 23">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 23
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 23</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 24">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 24">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 24
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 24</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 25">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 25">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 25
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 25</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 26">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 26">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 26
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 26</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 27">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 27">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 27
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 27</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 28">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 28">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 28
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 28</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 29">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 29">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 29
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 29</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 30">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 30">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 30
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 30</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 31">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 31">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 31
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 31</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 32">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 32">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 32
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 32</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 33">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 33">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 33
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 33</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 34">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 34">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 34
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 34</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 35">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 35">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 35
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 35</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 36">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 36">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 36
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 36</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 37">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 37">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 37
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 37</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 38">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 38">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                               DASH 38
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 38</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 39">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 39">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 39
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 39</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 40">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 40">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 40
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 40</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 41">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 41">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 41
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 41</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 42">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 42">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 42
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 42</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 43">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 43">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 43
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 43</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 44">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 44">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 44
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 44</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 45">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 45">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 45
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 45</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 46">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 46">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 46
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 46</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 47">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 47">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 47
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 47</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 8" data-name="DASH 48">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 48">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 48
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 48</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 9" data-name="DASH 49">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 49">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                                DASH 49
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 49</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Categoria 9" data-name="DASH 50">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH 50">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
+                               DASH 50
+                            </a>
+                        </div>
+                        <div class="tool-card-category">CATEGORIA DASH 50</div>
+                    </article>
+                    
+                </section>
+            </main>
+
+            <div class="demand-footer">
+                <h2>Dúvidas ou Sugestões?</h2>
+                <div style="margin-top: 1rem;">
+                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                </div>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- NAVBAR -->
+     
+    <div class="modern-navbar" aria-hidden="false">
+      <div class="nav-pill" role="tablist" aria-label="Navegação principal">
+<button class="nav-item" data-content-id="idea" role="tab" aria-selected="false">
+  <span class="icon"><i class='bx bxs-home'></i></span>
+  <span class="label">Home</span>
+</button>
+
+<button class="nav-item active" data-content-id="controles" role="tab" aria-selected="true">
+  <span class="icon"><i class='bx bxs-dashboard'></i></span>
+  <span class="label">Controles</span>
+</button>
+        <button class="nav-item" data-content-id="outros" role="tab" aria-selected="false">
+          <span class="icon"><i class='bx bxs-layer'></i></span>
+          <span class="label">Outros</span>
+        </button>
+
+<button class="nav-item" data-action="favorites" role="button" title="Favoritos">
+  <span class="icon"><i class='bx bxs-star'></i></span>
+  <span class="label">Favoritos</span>
+</button>
+
+        <button class="nav-item" data-action="docs" role="button" title="Documentação">
+          <span class="icon"><i class='bx bxs-file-doc'></i></span>
+          <span class="label">Doc</span>
+        </button>
+      </div>
+      
+
+      <!-- Botão laranja flutuante (FAB) -->
+      <button class="fab" title="Ações">
+        <i class='bx bxs-star'></i>
+      </button>
+    </div>
+
+    <script>
+        const ICON_MAP = {
+            "DASH 5": "https://i.ibb.co/8DfzH8nS/image.png",
+            "DASH 6": "https://i.ibb.co/JRQML5HS/image.png",
+            "DASH 7": "https://i.ibb.co/JRQML5HS/image.png",
+            "DASH 8": "https://i.ibb.co/1fjh4Mv3/image.png",
+            "DASH 9": "https://i.ibb.co/XZwxVq1M/image.png",
+            "DASH 10": "https://i.ibb.co/rfpV77g8/image.png",
+            "DASH 11": "https://i.ibb.co/KpQYp3nK/image.png",
+            "DASH 12": "https://i.ibb.co/B5YpCV2w/image.png",
+            "DASH 13": "https://i.ibb.co/LDWzCjyv/image.png",
+            "DASH 14": "https://i.ibb.co/6JVxjJBX/image.png",
+            "DASH 15": "https://i.ibb.co/DnJb662/image.png",
+            "DASH 16": "https://i.ibb.co/GvdV2xWP/image.png",
+            "DASH 17": "https://i.ibb.co/kCHTtRr/image.png",
+            "DASH 18": "https://i.ibb.co/WNy0zmKQ/image.png",
+            "DASH 19": "https://i.ibb.co/v4GKSTG9/image.png",
+            "DASH 20": "https://i.ibb.co/hxbH8cdP/image.png",
+            "DASH 21": "https://i.ibb.co/JjKB8dDK/image.png",
+            "DASH 22": "https://i.ibb.co/Sw9Msf4w/image.png",
+            "DASH 23": "https://i.ibb.co/kVLkgzDh/image.png",
+            "DASH 24": "https://i.ibb.co/xK0MF871/image.png",
+            "DASH 25": "https://i.ibb.co/k2xpCHG9/image.png",
+            "DASH 26": "https://i.ibb.co/C3N5JBJY/image.png",
+            "DASH 27": "https://i.ibb.co/mCMycf6W/image.png",
+            "DASH 28": "https://i.ibb.co/JR9bf1bQ/image.png",
+            "DASH 29": "https://i.ibb.co/fV66VWdh/image.png",
+            "DASH 30": "https://i.ibb.co/WNtLGkqQ/image.png",
+            "DASH 31": "https://i.ibb.co/23yGnXwr/image.png",
+            "DASH 32": "https://i.ibb.co/fRq1vmp/image.png",
+            "DASH 33": "https://i.ibb.co/SXcvngb3/image.png",
+            "DASH 34": "https://i.ibb.co/vx8MgcVq/image.png",
+            "DASH 35": "https://i.ibb.co/LD7Ns7Zx/image.png",
+            "DASH 36": "https://i.ibb.co/N6s5YXGR/image.png",
+            "DASH 37": "https://i.ibb.co/20CQv5X7/image.png",
+            "DASH 38": "https://i.ibb.co/ds2Nd07n/image.png",
+            "DASH 39": "https://i.ibb.co/KzDWFm3Q/image.png",
+            "DASH 40": "https://i.ibb.co/1tfyFf1S/image.png",
+            "DASH 41": "https://i.ibb.co/cGxfYGR/image.png",
+            "DASH 42": "https://i.ibb.co/B2jWfXLb/image.png",
+            "DASH 43": "https://i.ibb.co/tpmzDK9R/image.png",
+            "DASH 44": "https://i.ibb.co/Hfyg5qVD/image.png",
+            "DASH 45": "https://i.ibb.co/v5DX11r/image.png",
+            "DASH 46": "https://i.ibb.co/ycNPQQNS/image.png",
+            "DASH 47": "https://i.ibb.co/v4CWHxrT/image.png",
+            "DASH 48": "https://i.ibb.co/NdGMLYH7/image.png",
+            "DASH 49": "https://i.ibb.co/YFFzFQLw/image.png",
+            "DASH 50": "https://i.ibb.co/wFW5y1SD/image.png",
+            "DASH 1": "https://i.ibb.co/848cg7DG/image.png",
+            "DASH 2": "https://i.ibb.co/PGvhrQsL/image.png",
+            "DASH 3": "https://i.ibb.co/C5gQv1zf/image.png",
+            "DASH 4": "https://i.ibb.co/NdLRzvLH/image.png"
+        };
+
+        function loadIconsManually() {
+            // Seleciona todos os cards em TODAS as seções que carregam ícones
+            const allCards = document.querySelectorAll("#controles-content .tool-card, #outros-content .tool-card, #toolGrid .tool-card, #icqaGrid .tool-card"); 
+            
+            allCards.forEach(card => {
+                const name = (card.dataset.name || '').trim();
+                const img = card.querySelector(".tool-card-img");
+                if (!img || !name) return;
+                const url = ICON_MAP[name];
+                if (url) {
+                    img.src = url;
+                } else {
+                    img.style.opacity = "0"; 
+                }
+            });
+        }
+        
+        const filterButtons = document.querySelectorAll("#controles-content .filter-btn");
+        const toolCards = document.querySelectorAll("#controles-content .tool-card");
+        
+        // Lógica do Filtro por categoria
+        filterButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                filterButtons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                const filter = btn.dataset.filter;
+
+                toolCards.forEach(card => {
+                    const cat = card.dataset.category;
+                    const show = filter === "all" || filter === cat;
+                    card.style.display = show ? "flex" : "none";
+                });
+            });
+        });
+
+        document.querySelectorAll(".tool-card").forEach(card => {
+            card.addEventListener("click", () => {
+                card.style.boxShadow = "0 0 0 4px rgba(255, 179, 0, 0.5)";
+                setTimeout(() => (card.style.boxShadow = "none"), 200);
+            });
+        });
+
+        const ideaContent = document.getElementById('idea-content');
+        const controlesContent = document.getElementById('controles-content');
+        const outrosContent = document.getElementById('outros-content'); 
+
+        function showContent(sectionId) {
+            // Oculta todas as seções
+            ideaContent.classList.add('hidden');
+            controlesContent.classList.add('hidden');
+            outrosContent.classList.add('hidden'); 
+            
+            // Exibe a seção correta
+            if (sectionId === 'idea') {
+                ideaContent.classList.remove('hidden');
+            } else if (sectionId === 'controles') {
+                controlesContent.classList.remove('hidden');
+            } else if (sectionId === 'outros') {
+                outrosContent.classList.remove('hidden');
+            }
+        }
+
+        const navItems = document.querySelectorAll('.modern-navbar .nav-item');
+        const fab = document.querySelector('.modern-navbar .fab');
+
+        function activateNavItem(item) {
+            navItems.forEach(n => {
+                n.classList.remove('active');
+                n.setAttribute('aria-selected', 'false');
+            });
+
+            item.classList.add('active');
+            item.setAttribute('aria-selected', 'true');
+
+            const contentId = item.dataset.contentId;
+            if (contentId) {
+                showContent(contentId);
+            } else if (item.dataset.action === 'docs') {
+                alert('Funcionalidade de Documentação em breve!');
+            }
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                activateNavItem(item);
+            });
+        });
+
+        if (fab) {
+            fab.addEventListener('click', () => {
+                alert('Ação rápida — personalize conforme necessário');
+            });
+        }
+</script>
+
+<script>
+
+/* ======= CONFIG ======= */
+function getUserId(){ return window.__CURRENT_USER_ID__ || null; } // sobrescreva externamente se tiver auth
+function favKey(userId){ return `ct_favorites_${userId || 'anon'}`; }
+function makeDashId(raw){
+  if(!raw) return '';
+  return String(raw).toLowerCase().trim().replace(/\s+/g,'_').replace(/[^a-z0-9_\-]/g,'');
+}
+
+/* ======= STORAGE HELPERS ======= */
+function loadFavArr(userId){
+  try {
+    const raw = localStorage.getItem(favKey(userId));
+    return raw ? JSON.parse(raw) : [];
+  } catch(e){ console.warn('loadFavArr', e); return []; }
+}
+function saveFavArr(userId, arr){
+  try { localStorage.setItem(favKey(userId), JSON.stringify(Array.from(new Set(arr)))); }
+  catch(e){ console.warn('saveFavArr', e); }
+}
+
+/* ======= UI HELPERS ======= */
+function createFavButton(dashId){
+  const btn = document.createElement('button');
+  btn.className = 'fav-btn';
+  btn.type = 'button';
+  btn.title = 'Favoritar';
+  btn.setAttribute('aria-pressed','false');
+  btn.dataset.dashId = dashId || '';
+  btn.innerHTML = "<i class='bx bxs-star'></i>";
+  return btn;
+}
+
+/* Remove fav-btns órfãos/duplicados e garante consistência: só 1 por card */
+function injectFavButtonsAll(){
+  document.querySelectorAll('.tool-card').forEach(card=>{
+    // determine dashId (prefer data-dash-id existente)
+    let dashId = card.getAttribute('data-dash-id') || makeDashId(card.dataset.name || '');
+    card.setAttribute('data-dash-id', dashId);
+
+    const wrapper = card.querySelector('.tool-card-icon-wrapper');
+    if(!wrapper) return;
+
+    // Remove botões com dashId duplicado dentro do mesmo wrapper (defensivo)
+    const existingBtns = Array.from(wrapper.querySelectorAll('.fav-btn'));
+    // keep only the first valid one; remove others that conflict
+    let kept = false;
+    existingBtns.forEach(b=>{
+      if(kept){ b.remove(); return; }
+      if(b.dataset && b.dataset.dashId && b.dataset.dashId === dashId){
+        kept = true;
+      } else {
+        // remove any .fav-btn that is not matching the canonical dashId (cleanup)
+        b.remove();
+      }
+    });
+
+    // if none exists, append new
+    if(!wrapper.querySelector(`.fav-btn[data-dash-id="${dashId}"]`)){
+      const btn = createFavButton(dashId);
+      wrapper.appendChild(btn);
+    }
+  });
+}
+
+/* metadata util (title, href, thumb) */
+function metadataFor(dashId){
+  // find by data-dash-id
+  const card = document.querySelector(`.tool-card[data-dash-id="${CSS.escape ? CSS.escape(dashId) : dashId}"]`) ||
+               document.querySelector(`.tool-card[data-name="${dashId}"]`);
+  const title = card?.querySelector('.tool-card-title a')?.textContent?.trim() || card?.dataset.name || dashId;
+  const href = card?.querySelector('.tool-card-title a')?.href || '#';
+  let thumb = null;
+  if (typeof ICON_MAP !== 'undefined') {
+    // try by original name first
+    thumb = ICON_MAP[card?.dataset.name] || ICON_MAP[dashId] || null;
+  }
+  if(!thumb){
+    const img = card?.querySelector('.tool-card-img');
+    if(img && img.src) thumb = img.src;
+  }
+  return { title, href, thumb };
+}
+
+/* ======= POPOVER / BADGE CREATION (singletons) ======= */
+function ensurePopoverAndBadge(){
+  const navPill = document.querySelector('.modern-navbar .nav-pill');
+  if(!navPill) return null;
+
+  // find or create favNavItem
+  let favNavItem = document.querySelector('.modern-navbar .nav-item[data-action="favorites"]');
+  if(!favNavItem){
+    const favNav = document.createElement('button');
+    favNav.className = 'nav-item';
+    favNav.setAttribute('data-action','favorites');
+    favNav.type = 'button';
+    favNav.innerHTML = '<span class="icon"><i class="bx bxs-star"></i></span><span class="label">Favoritos</span>';
+    const fab = document.querySelector('.modern-navbar .fab');
+    if(fab) navPill.insertBefore(favNav, fab);
+    else navPill.appendChild(favNav);
+    favNavItem = favNav;
+  }
+
+  // badge
+  let badge = favNavItem.querySelector('.fav-badge');
+  if(!badge){
+    badge = document.createElement('span');
+    badge.className = 'fav-badge';
+    favNavItem.appendChild(badge);
+  }
+
+  // popover (attach to favNavItem)
+  let pop = favNavItem.querySelector('.fav-popover');
+  if(!pop){
+    pop = document.createElement('div');
+    pop.className = 'fav-popover';
+    pop.innerHTML = `
+      <div class="header">
+        <h4>Meus Favoritos</h4>
+        <button class="close-pop" aria-label="Fechar" title="Fechar" style="background:transparent;border:none;color:#cfcfd3;cursor:pointer;font-weight:700">✕</button>
+      </div>
+      <div class="fav-list" role="list"></div>
+      <div class="empty" style="display:none">Você ainda não favoritou nenhum item.</div>
+    `;
+    favNavItem.appendChild(pop);
+  }
+
+  return { favNavItem, badge, pop, favList: pop.querySelector('.fav-list'), emptyMsg: pop.querySelector('.empty'), closeBtn: pop.querySelector('.close-pop') };
+}
+
+/* ======= RENDER POPUP ======= */
+function renderPopoverContents(context){
+  if(!context) return;
+  const userId = getUserId();
+  const favs = loadFavArr(userId);
+  const { badge, favList, emptyMsg } = context;
+  badge.textContent = favs.length > 0 ? String(favs.length) : '';
+  favList.innerHTML = '';
+  if(!favs.length){
+    emptyMsg.style.display = 'block';
+    favList.style.display = 'none';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+  favList.style.display = 'flex';
+  favs.forEach(id=>{
+    const md = metadataFor(id);
+    const item = document.createElement('div');
+    item.className = 'fav-item';
+    item.setAttribute('role','listitem');
+    item.innerHTML = `
+      <div class="thumb">${md.thumb ? `<img src="${md.thumb}" alt="${md.title}">` : `<i class='bx bxs-star' style="font-size:20px;opacity:.9"></i>`}</div>
+      <div class="meta">
+        <div class="title">${md.title}</div>
+        <div class="sub">${id}</div>
+      </div>`;
+    item.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(md.href && md.href !== '#') window.open(md.href, '_blank');
+      // close popover
+      context.pop.classList.remove('open');
+    });
+    favList.appendChild(item);
+  });
+}
+
+/* ======= SHOW/HIDE POPOVER ======= */
+function showPopover(context){
+  if(!context) return;
+  renderPopoverContents(context);
+  context.pop.classList.add('open');
+  const rect = context.favNavItem.getBoundingClientRect();
+  const popRect = context.pop.getBoundingClientRect();
+  const viewportW = window.innerWidth;
+  let left = rect.left + rect.width/2 - popRect.width/2;
+  left = Math.max(8, Math.min(left, viewportW - popRect.width - 8));
+  const favRect = context.favNavItem.getBoundingClientRect();
+  context.pop.style.left = `${left - favRect.left + context.favNavItem.clientWidth/2}px`;
+}
+function hidePopover(context){ if(context) context.pop.classList.remove('open'); }
+
+function markFavButtonsUI(){
+  const userId = getUserId();
+  const favs = new Set(loadFavArr(userId));
+  document.querySelectorAll('.fav-btn').forEach(btn=>{
+    const id = btn.dataset.dashId;
+    if(!id) return;
+    const isFav = favs.has(id);
+    btn.classList.toggle('active', isFav);
+    btn.setAttribute('aria-pressed', String(Boolean(isFav)));
+  });
+  const ctx = ensurePopoverAndBadge();
+  if(ctx && ctx.badge) ctx.badge.textContent = favs.size > 0 ? String(favs.size) : '';
+}
+
+function toggleFavorite(dashId){
+  const userId = getUserId();
+  const arr = loadFavArr(userId);
+  const idx = arr.indexOf(dashId);
+  if(idx === -1) arr.push(dashId); else arr.splice(idx,1);
+  saveFavArr(userId, arr);
+  markFavButtonsUI();
+  const ctx = ensurePopoverAndBadge();
+  renderPopoverContents(ctx);
+}
+
+function showOnlyFavorites(){
+  const userId = getUserId();
+  const favArr = loadFavArr(userId) || [];
+  const favSet = new Set(favArr.map(String));
+  const allCards = document.querySelectorAll('.card-grid .tool-card, #toolGrid .tool-card, #icqaGrid .tool-card');
+  allCards.forEach(card=>{
+    let id = card.getAttribute('data-dash-id') || makeDashId(card.dataset.name || '');
+    const btn = card.querySelector('.fav-btn');
+    if(btn && btn.dataset.dashId) id = btn.dataset.dashId;
+    const shouldShow = favSet.has(id);
+    card.style.display = shouldShow ? 'flex' : 'none';
+  });
+  const controlesSection = document.getElementById('controles-content');
+  if(controlesSection){
+    const anyVisible = Array.from(controlesSection.querySelectorAll('.tool-card')).some(c => c.style.display !== 'none');
+    controlesSection.classList.toggle('hidden', !anyVisible);
+    if(anyVisible) showContent('controles');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  try { loadIconsManually && loadIconsManually(); } catch(e){}
+
+  injectFavButtonsAll();
+
+  const ctx = ensurePopoverAndBadge();
+  if(!ctx){
+    console.warn('Fav module: nav pill não encontrada — favoritos desativados.');
+    return;
+  }
+  ctx.pop = ctx.pop;
+  ctx.favNavItem = ctx.favNavItem || document.querySelector('.modern-navbar .nav-item[data-action="favorites"]') || document.querySelector('.modern-navbar .nav-item');
+
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.fav-btn');
+    if(btn){
+      e.stopPropagation();
+      const dashId = btn.dataset.dashId;
+      if(!dashId){ console.warn('fav-btn sem data-dash-id'); return; }
+      toggleFavorite(dashId);
+      return;
+    }
+  });
+
+  ctx.favNavItem.addEventListener('click', (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    if(ctx.pop.classList.contains('open')) hidePopover(ctx);
+    else {
+      markFavButtonsUI();
+      renderPopoverContents(ctx);
+      showPopover(ctx);
+    }
+  });
+
+  ctx.closeBtn && ctx.closeBtn.addEventListener('click', (e)=>{ e.stopPropagation(); hidePopover(ctx); });
+
+  document.addEventListener('click', (e)=>{
+    if(!ctx.favNavItem.contains(e.target)) hidePopover(ctx);
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') hidePopover(ctx); });
+
+  markFavButtonsUI();
+
+  ctx.favNavItem.addEventListener('click', (ev)=>{
+    if(ev.shiftKey){ 
+      ev.preventDefault();
+      showOnlyFavorites();
+    }
+  });
+
+  // 10) Expose helpers for debugging if necessário
+  window.__CT_fav = { injectFavButtonsAll, loadFavArr, saveFavArr, toggleFavorite, renderPopoverContents, showOnlyFavorites };
+});
+</script>
+<style>
+  /* container do robô no canto direito */
+  .robot-corner {
+    position: fixed;
+    right: 22px;
+    bottom: 24px;
+    width: 140px;           /* ajuste o tamanho aqui */
+    height: 160px;          /* ajuste o tamanho aqui */
+    z-index: 1000;
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transform-origin: center;
+  }
+
+  /* cartão que segura a imagem para aplicar sombras / glows */
+  .robot-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: visible;
+    display: block;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* imagem base (corpo) */
+  .robot-base {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transform-origin: center;
+    transition: transform 250ms cubic-bezier(.2,.9,.2,1);
+    will-change: transform;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+  }
+
+  /* camada da cabeça (mesma imagem, mas recortada) */
+  .robot-head {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transform-origin: 50% 40%; /* ponto de rotação aproximado da 'nuca' - ajustar se necessário */
+    transition: transform 120ms linear;
+    will-change: transform;
+    clip-path: polygon(
+      40% 6%, 60% 6%, 78% 30%, 78% 46%, 72% 56%, 58% 66%, 44% 66%, 28% 56%, 22% 44%, 28% 20%
+    );
+    /* se precisar desenhar borda ou destaque: */
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+  }
+
+  /* glow leve quando o mouse estiver sobre o robô */
+  .robot-corner:hover .robot-base {
+    transform: translateY(-4px) scale(1.02);
+    transition-duration: 200ms;
+  }
+
+  .robot-glow {
+    position: absolute;
+    left: 50%;
+    top: 65%;
+    transform: translate(-50%, -50%);
+    width: 180%;
+    height: 120%;
+    background: radial-gradient(circle at 50% 40%, rgba(65,185,111,0.10), transparent 40%);
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(10px);
+    opacity: 0;
+    transition: opacity 180ms;
+  }
+  .robot-corner:hover .robot-glow { opacity: 1; }
+
+  /* animação sutil de 'respirar' (idle) */
+  @keyframes robot-breathe {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.01); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  .robot-base, .robot-head { animation: robot-breathe 4s ease-in-out infinite; }
+
+  /* diminui a animação em mobile e evita follower por toque */
+  @media (max-width: 520px) {
+    .robot-corner { right: 12px; bottom: 12px; width: 110px; height: 120px; }
+    .robot-base, .robot-head { animation: none; transition: none; }
+  }
+  /* Gradiente animado no texto */
+.logo-text-main.blank { 
+  font-weight: 900;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #321be1, #41B96F, #e71b1b, #FFB300, #111cad);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ct-gradient 3s linear infinite;
+}
+
+@keyframes ct-gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-text-main.blank { animation: none; background-size: auto; color: #1df70a; -webkit-background-clip: unset; background-clip: unset; } 
+}
+/* Borda animada ao redor do título */
+.logo-text-main.animated {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+  border-radius: 12px;
+  padding: 6px 12px; /* espaço para o glow */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.logo-text-main.animated::before{
+  content: "";
+  position: absolute;
+  inset: -10px;                 /* controla espessura do anel */
+  z-index: -2;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(127, 76, 255, 0.95), rgba(255,179,0,0.95), rgba(36, 5, 238, 0.95));
+  filter: blur(294px);           /* espalha o glow */
+  opacity: 0.5;
+  pointer-events: none;
+  transform: translateZ(0);
+  animation: ct-border-move 2s linear infinite;
+}
+
+.logo-text-main.animated::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(65,185,111,0.14), transparent 30%),
+              radial-gradient(circle at 70% 60%, rgba(255,179,0,0.12), transparent 30%);
+  filter: blur(116px);
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* animação do gradiente */
+@keyframes ct-border-move {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-text-main.animated::after { animation: none; filter: blur(2px); }
+}
+
+</style>
+
+<div class="robot-corner" id="robotCorner" aria-hidden="false" title="Robô Control Tower">
+  <div class="robot-card" id="robotCard">
+    <img class="robot-base" id="robotBase" src="https://i.ibb.co/NdN67DT5/image.png" alt="Robô">
+    <img class="robot-head" id="robotHead" src="https://i.ibb.co/NdN67DT5/image.png" alt="" aria-hidden="true">
+    <div class="robot-glow" aria-hidden="true"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const corner = document.getElementById('robotCorner');
+  const head = document.getElementById('robotHead');
+  const base = document.getElementById('robotBase');
+  const card = document.getElementById('robotCard');
+
+  if (!corner || !head || !base) return;
+
+  const maxRotate = 18;       
+  const maxTranslate = 6;     
+  const followEase = 0.12;    
+
+  let rect = corner.getBoundingClientRect();
+  let headCenter = { x: rect.left + rect.width * 0.5, y: rect.top + rect.height * 0.32 };
+
+  function refreshRect() {
+    rect = corner.getBoundingClientRect();
+    headCenter = {
+      x: rect.left + rect.width * 0.5,
+      y: rect.top + rect.height * 0.32
+    };
+  }
+  window.addEventListener('resize', refreshRect);
+  window.addEventListener('scroll', refreshRect, { passive: true });
+
+  function lookAt(clientX, clientY) {
+    const dx = clientX - headCenter.x;
+    const dy = clientY - headCenter.y;
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const mapped = Math.max(-maxRotate, Math.min(maxRotate, (angle - 90) * 0.25));
+    const dist = Math.min(1, Math.hypot(dx, dy) / Math.max(rect.width, rect.height));
+    const tx = (dx / rect.width) * maxTranslate * dist;
+    const ty = (dy / rect.height) * maxTranslate * dist;
+
+    head.style.transform = `translate(${tx}px, ${ty}px) rotate(${mapped}deg)`;
+    base.style.transform = `translateY(${Math.max(-3, -dist*6)}px) scale(${1 + dist*0.01})`;
+  }
+
+  function resetLook() {
+    head.style.transform = '';
+    base.style.transform = '';
+  }
+
+  corner.addEventListener('mousemove', (ev) => {
+    lookAt(ev.clientX, ev.clientY);
+  });
+
+  corner.addEventListener('mouseenter', () => {
+    refreshRect();
+    corner.classList.add('robot-hover');
+  });
+
+  // quando o mouse sair do container, reseta
+  corner.addEventListener('mouseleave', () => {
+    resetLook();
+    corner.classList.remove('robot-hover');
+  });
+
+  corner.addEventListener('focus', () => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    lookAt(centerX, centerY);
+  }, true);
+  corner.addEventListener('blur', resetLook, true);
+
+  let touchActive = false;
+  corner.addEventListener('touchstart', (e) => {
+    touchActive = true;
+    refreshRect();
+    if (e.touches && e.touches[0]) {
+      lookAt(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+  corner.addEventListener('touchmove', (e) => {
+    if (!touchActive) return;
+    if (e.touches && e.touches[0]) {
+      lookAt(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+  corner.addEventListener('touchend', () => {
+    touchActive = false;
+    resetLook();
+  });
+
+  refreshRect();
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const gifUrl = "https://lh3.googleusercontent.com/sitesv/AAzXCkdaNi0YqrH1X6RBeDo51FHy5S2TRinXWX03DiUtXKMWXUenk_qyFKVAbZeDbDpwq6bWH82wWpvAkrpviW5o4vvmDS80uewHGzvJIcGXlBQvKtjYFe_a1-NSEPsymhfY6DTimGsah3S8LG-fnnI28IUcxG9c8xNDs-e3EBJpppxsYDfMTKdNuvKGlmjyI_nsTi3Q_v2aFGu06kxqNf45_m1lm-KeeebSuv_V1r0=w1280";
+
+  if(!document.querySelector('#bottomGifStyles')) {
+    const style = document.createElement('style');
+    style.id = 'bottomGifStyles';
+    style.innerHTML = `
+      .bottom-gif { width:100%; height:200px; background-repeat:no-repeat; background-position:center center; background-size:contain; pointer-events:none; box-sizing:border-box; z-index:0; display:block; margin:0 auto; }
+      @media(max-width:900px){ .bottom-gif{height:140px;} }
+      @media(max-width:420px){ .bottom-gif{height:110px;} }
+    `;
+    document.head.appendChild(style);
+  }
+
+  document.querySelectorAll('.demand-footer').forEach(footer => {
+    // se já tem um .bottom-gif imediatamente antes, pula
+    const prev = footer.previousElementSibling;
+    if(prev && prev.classList && prev.classList.contains('bottom-gif')) return;
+
+    const div = document.createElement('div');
+    div.className = 'bottom-gif';
+    div.style.backgroundImage = `url('${gifUrl}')`;
+    footer.parentNode.insertBefore(div, footer);
+  });
+});
+
+</script>
+<script>
+
+
+(function replicateHomeBg() {
+  const sourceSelector = '#idea-content'; 
+  const targetSelectors = ['#outros-content', '#controles-content']; 
+
+  function getBgCssFrom(el) {
+    if (!el) return null;
+    const cs = window.getComputedStyle(el);
+    return {
+      'background-image': cs.getPropertyValue('background-image'),
+      'background-attachment': cs.getPropertyValue('background-attachment'),
+      'background-position': cs.getPropertyValue('background-position'),
+      'background-size': cs.getPropertyValue('background-size'),
+      'background-repeat': cs.getPropertyValue('background-repeat'),
+      'background-color': cs.getPropertyValue('background-color'),
+    };
+  }
+
+  function applyBgCssTo(target, cssObj) {
+    if (!target || !cssObj) return;
+    target.style.backgroundImage = cssObj['background-image'] || '';
+    target.style.backgroundAttachment = cssObj['background-attachment'] || '';
+    target.style.backgroundPosition = cssObj['background-position'] || '';
+    target.style.backgroundSize = cssObj['background-size'] || '';
+    target.style.backgroundRepeat = cssObj['background-repeat'] || '';
+    target.style.backgroundColor = cssObj['background-color'] || '';
+  }
+
+  function replicateOnce() {
+    const src = document.querySelector(sourceSelector);
+    if (!src) {
+      console.warn('[replicateHomeBg] source not found:', sourceSelector);
+      return;
+    }
+    const cssObj = getBgCssFrom(src);
+
+    targetSelectors.forEach(sel => {
+      const tgt = document.querySelector(sel);
+      if (!tgt) {
+        console.warn('[replicateHomeBg] target not found:', sel);
+        return;
+      }
+      applyBgCssTo(tgt, cssObj);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', replicateOnce);
+  } else {
+    replicateOnce();
+  }
+
+  document.addEventListener('click', function (e) {
+    const navBtn = e.target.closest('.modern-navbar .nav-item');
+    if (!navBtn) return;
+    setTimeout(replicateOnce, 50);
+  });
+
+  window.__replicateHomeBg = replicateOnce;
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // seletor do botão que queremos ativar por padrão
+  const defaultNav = document.querySelector('.modern-navbar .nav-item[data-content-id="controles"]');
+  if (defaultNav && typeof activateNavItem === 'function') {
+    // usa a função existente para garantir que tudo seja atualizado (classes, aria, conteúdo)
+    activateNavItem(defaultNav);
+  } else if (defaultNav) {
+    // fallback: aplica classes e mostra a seção manualmente
+    document.querySelectorAll('.modern-navbar .nav-item').forEach(n => {
+      n.classList.remove('active');
+      n.setAttribute('aria-selected', 'false');
+    });
+    defaultNav.classList.add('active');
+    defaultNav.setAttribute('aria-selected', 'true');
+
+    // mostra/esconde seções (IDs no HTML: idea-content, controles-content, outros-content)
+    document.getElementById('idea-content')?.classList.add('hidden');
+    document.getElementById('outros-content')?.classList.add('hidden');
+    document.getElementById('controles-content')?.classList.remove('hidden');
+  }
+});
+</script>
+<style>
+/* Modal básico e responsivo */
+.bio-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,10,12,0.6);
+  z-index: 15000;
+  padding: 20px;
+}
+.bio-modal.open { display: flex; }
+
+.bio-modal-card {
+  width: 100%;
+  max-width: 980px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .bio-modal-card { grid-template-columns: 1fr; max-width: 720px; }
+}
+
+.bio-left {
+  padding: 28px;
+}
+
+.bio-right {
+  background: linear-gradient(180deg,#f5f5f7,#ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.bio-avatar {
+  width: 320px;
+  height: 320px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+@media (max-width: 900px) { .bio-avatar { width: 100%; height: auto; max-height: 420px; } }
+
+.bio-name { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; color: #222; }
+.bio-role { font-size: 0.95rem; color: #666; margin-bottom: 18px; }
+
+.bio-text { font-size: 0.98rem; line-height: 1.6; color: #333; margin-bottom: 16px; }
+
+.bio-tools { display:flex; flex-wrap:wrap; gap:8px; margin-top: 4px; }
+.bio-tool { background:#f0f0f0; color:#222; padding:6px 10px; border-radius:6px; font-weight:600; font-size:0.85rem; }
+
+.bio-close {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #fff;
+  outline: none;
+}
+
+.bio-modal .close-overlay { position:absolute; inset:0; z-index: -1; }
+</style>
+
+<!-- Modal markup -->
+<div id="bioModal" class="bio-modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="close-overlay" data-bio-close></div>
+
+  <div class="bio-modal-card" role="document" aria-labelledby="bioName">
+    <div class="bio-left">
+      <button class="bio-close" aria-label="Fechar" data-bio-close>&times;</button>
+      <div id="bioName" class="bio-name">Nome</div>
+      <div id="bioRole" class="bio-role">Cargo / categoria</div>
+      <div id="bioText" class="bio-text">Resumo / bio do colaborador</div>
+
+      <div>
+        <strong>Ferramentas:</strong>
+        <div id="bioTools" class="bio-tools"></div>
+      </div>
+    </div>
+
+    <div class="bio-right">
+      <img id="bioAvatar" class="bio-avatar" src="" alt="Foto do colaborador">
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const modal = document.getElementById('bioModal');
+  const nameEl = document.getElementById('bioName');
+  const roleEl = document.getElementById('bioRole');
+  const textEl = document.getElementById('bioText');
+  const toolsEl = document.getElementById('bioTools');
+  const avatarEl = document.getElementById('bioAvatar');
+
+  function openModal(data){
+    nameEl.textContent = data.name || '';
+    roleEl.textContent = data.role || '';
+    textEl.textContent = data.bio || '';
+    avatarEl.src = data.photo || '';
+    avatarEl.alt = data.name ? 'Foto de ' + data.name : 'Foto do colaborador';
+
+    // ferramentas: array ou string (separada por vírgula)
+    toolsEl.innerHTML = '';
+    const tools = Array.isArray(data.tools) ? data.tools : (String(data.tools || '').split(',').map(s=>s.trim()).filter(Boolean));
+    tools.forEach(t=>{
+      const el = document.createElement('div');
+      el.className = 'bio-tool';
+      el.textContent = t;
+      toolsEl.appendChild(el);
+    });
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    // foco no fechar
+    modal.querySelector('[data-bio-close]')?.focus();
+  }
+
+  function closeModal(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  // click em qualquer imagem de .team-member abre modal (pega dados do parent .team-member)
+  document.querySelectorAll('.team-member').forEach(member => {
+    // permitimos clique na imagem ou no próprio bloco
+    member.addEventListener('click', (e) => {
+      e.preventDefault();
+      // prioriza dataset; se não existir, tenta extrair do DOM (nome e cargo)
+      const ds = member.dataset || {};
+      const data = {
+        name: ds.name || member.querySelector('p')?.textContent?.trim() || '',
+        role: ds.role || member.querySelector('small')?.textContent?.trim() || '',
+        bio: ds.bio || '',
+        photo: ds.photo || member.querySelector('img')?.src || '',
+        tools: ds.tools || ''
+      };
+      openModal(data);
+    });
+  });
+
+  // close handlers
+  modal.querySelectorAll('[data-bio-close]').forEach(btn => btn.addEventListener('click', closeModal));
+  // fechar clicando fora do card
+  modal.addEventListener('click', (e)=>{
+    if(e.target === modal) closeModal();
+  });
+  // ESC fecha
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+})();
+
+</script>
+
+</body>
+</html>
+
+
+
