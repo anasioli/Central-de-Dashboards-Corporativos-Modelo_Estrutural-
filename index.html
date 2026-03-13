@@ -6,38 +6,146 @@
     <title>Controles Gerais - Control Tower</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <!-- favicon padrão -->
-<link rel="icon" href="https://i.ibb.co/0yQDG7QG/image.png">
-<link rel="icon" href="https://i.ibb.co/0yQDG7QG/image.png">
-<!-- fallback / IE -->
-<link rel="shortcut icon" href="https://i.ibb.co/0yQDG7QG/image.png">
+<!-- favicon principal (PNG 32x32 recomendado) -->
+<link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/XZGKX5pF/image.png">
+
+<!-- fallback para browsers antigos -->
+<link rel="shortcut icon" href="https://i.ibb.co/XZGKX5pF/image.png">
+
+<!-- ícone para iOS / telas iniciais -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/XZGKX5pF/image.png">
 
     <style>
 
-
-
-/* ===== Fav popover na modern-navbar ===== */
-.modern-navbar{
+/* ===== Sidebar lateral ===== */
+.sidebar {
   position: fixed;
-  top: 0;
   left: 0;
-  right: 0;
-  height: 56px;                /* altura recolhida */
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg,#0b0b0c,#101113);
+  color: #fff;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 1000;
+  box-shadow: 2px 0 20px rgba(0,0,0,0.35);
+}
+/* Versão inline / esquerda: popover dentro da sidebar, logo abaixo do link Favoritos */
+.fav-popover.fav-sidebar-left {
+  position: absolute;      /* posicionado relativo à sidebar */
+  left: 0;
+  top: 0;                  /* será ajustado por JS para ficar abaixo do link */
+  width: 100%;             /* ocupa a largura da sidebar */
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  border-radius: 10px;
+  padding: 8px;
+  background: linear-gradient(180deg,#0b0b0c,#101113);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.04);
+  display: none;           /* toggle por classe .open */
+  z-index: 1200;
+}
+
+/* estado aberto (visível) */
+.fav-popover.fav-sidebar-left.open {
+  display: block;
+}
+
+/* visual interno */
+.fav-popover.fav-sidebar-left .header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom: 8px;
+}
+.fav-popover.fav-sidebar-left .fav-list { display:flex; flex-direction:column; gap:8px; }
+.fav-popover.fav-sidebar-left .empty { padding: 12px; color:#cfcfd3; text-align:center; }
+
+.sidebar .logo {
   display: flex;
   align-items: center;
-  justify-content: center;     /* centraliza o "pill" no topo */
-  padding: 8px 12px;
-  z-index: 200;
-  pointer-events: none;        /* container geral não captura cliques; items sim */
-  transition: height 240ms cubic-bezier(.2,.8,.2,1), box-shadow 240ms;
-  background: transparent;     /* transparente por padrão (header já tem cor) */
+  gap: 10px;
 }
-.nav-item[data-action="favorites"] { position: relative; }
+.sidebar .logo img { width:40px; height:48px; border-radius:8px; }
+.sidebar .logo .title { font-weight:800; letter-spacing:0.06em; color:#ffb300; font-size:1.05rem; }
 
-.nav-item[data-action="favorites"] .fav-badge {
+.sidebar nav {
+  display:flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  flex: 1;
+  overflow:auto;
+  padding-right:4px;
+}
+/* Fav drawer + badge (anexados à sidebar) */
+.fav-popover {
+  position: fixed;
+  z-index: 9999;
+  display: none;
+  background: linear-gradient(180deg, #101113, #0b0b0c);
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 24px 48px rgba(3,6,12,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+  max-width: calc(100vw - 40px);
+  overflow: hidden;
+}
+
+.fav-popover.fav-sidebar {
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 340px;
+  max-width: 92vw;
+  border-radius: 0;
+  padding: 18px;
+  transform: translateX(100%);
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1);
+  display: block;
+}
+.fav-popover.fav-sidebar.open { transform: translateX(0); }
+
+.fav-popover.fav-sidebar .header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom: 12px;
+}
+.fav-popover.fav-sidebar .fav-list {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-height: calc(100vh - 140px);
+  overflow:auto;
+  padding-right:8px;
+}
+.fav-popover.fav-sidebar .empty {
+  padding: 18px;
+  text-align: center;
+  color: #cfcfd3;
+  font-size: 13px;
+}
+.fav-popover.fav-sidebar .close-pop {
+  background:transparent;
+  border:none;
+  color:#cfcfd3;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* badge que fica no link da sidebar */
+.nav-fav-badge {
   position: absolute;
-  top: 2px;
-  right: 0px;
+  top: 8px;
+  right: 12px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
@@ -51,47 +159,115 @@
   color: #fff;
   box-shadow: 0 4px 10px rgba(0,0,0,0.25);
 }
+body.fav-drawer-open { overflow: hidden; }
 
-/* Popover */
-.fav-popover {
-  position: fixed;
-  right: 20px;                /* distância da borda direita */
-  top: 84px;                  /* um pouco abaixo do topo / navbar expandida */
-  width: 360px;
-  max-width: calc(100vw - 40px);
-  background: linear-gradient(180deg, #101113, #0b0b0c);
-  color: #fff;
-  border-radius: 14px;
-  padding: 10px;
-  box-shadow: 0 24px 48px rgba(3,6,12,0.6);
-  z-index: 9999;
-  border: 1px solid rgba(255,255,255,0.04);
-  display: none;
-  transform: none;            /* não usar translate que assumia posicionamento relativo */
+.sidebar a.nav-link {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  color:#cfcfd3;
+  text-decoration:none;
+  font-weight:700;
+  transition:background .12s, color .12s;
 }
 
-/* mostragem */
-.fav-popover.open { display: block; }
+.sidebar a.nav-link:hover { background: rgba(255,179,0,0.08); color:#fff; }
+.sidebar a.nav-link.active { background: linear-gradient(180deg,#ffb300,#e94b0c); color:#0a0909; }
 
-.fav-popover .header {
+/* ícone */
+.sidebar a.nav-link .bx { font-size:1.2rem; }
+
+/* botão collapse */
+.sidebar .collapse-btn {
+  border: none;
+  background: transparent;
+  color: #cfcfd3;
+  padding: 8px;
+  cursor: pointer;
+  align-self: stretch;
+  text-align: left;
+  border-radius: 8px;
+}
+
+/* versão colapsada */
+.sidebar.collapsed { width:76px; }
+.sidebar.collapsed .title { display:none; }
+.sidebar.collapsed nav a.nav-link { justify-content:center; padding:10px; }
+.sidebar.collapsed nav a.nav-link .label { display:none; }
+
+/* empurra o conteúdo principal para a direita */
+.main-with-sidebar {
+  margin-left: 260px; /* same as sidebar width */
+  transition: margin-left .18s ease;
+}
+.main-with-sidebar.compact { margin-left: 76px; }
+
+/* responsivo: esconde a sidebar em telas muito pequenas */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); transition: transform .22s ease; }
+  .sidebar.open { transform: translateX(0); }
+  .main-with-sidebar { margin-left: 0; }
+}
+
+
+/* ===== Fav popover na modern-navbar ===== */
+/* Versão lateral (drawer) */
+.fav-popover.fav-sidebar {
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 340px;               /* largura da drawer — ajuste aqui */
+  max-width: 92vw;
+  border-radius: 0;
+  padding: 18px;
+  transform: translateX(100%); /* escondida à direita */
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1);
+  display: block;             /* forçando o container para facilitar animação */
+}
+
+/* estado aberto (visible) */
+.fav-popover.fav-sidebar.open {
+  transform: translateX(0);
+}
+
+/* conteúdo interno — adapta para coluna longa */
+.fav-popover.fav-sidebar .header {
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
-.fav-popover .header h4 { margin:0; font-size:14px; font-weight:700; color:#fff; }
+.fav-popover.fav-sidebar .fav-list {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-height: calc(100vh - 140px);
+  overflow:auto;
+  padding-right:8px;
+}
+.fav-popover.fav-sidebar .empty {
+  padding: 18px;
+  text-align: center;
+  color: #cfcfd3;
+  font-size: 13px;
+}
 
-.fav-list { display:flex; flex-direction:column; gap:8px; max-height: 260px; overflow: auto; padding-right: 4px; }
-.fav-item { display:flex; gap:10px; align-items:center; padding:8px; border-radius:10px; cursor:pointer; transition: background .12s; }
-.fav-item:hover { background: rgba(255,255,255,0.03); }
-.fav-item .thumb { width:44px; height:44px; border-radius:8px; background:#111; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border: 1px solid rgba(255,255,255,0.03); }
-.fav-item .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-.fav-item .meta { display:flex; flex-direction:column; }
-.fav-item .meta .title { font-size:13px; font-weight:700; color:#fff; }
-.fav-item .meta .sub { font-size:12px; color:#cfcfd3; }
+/* ajusta o botão fechar para ficar visível no topo da drawer */
+.fav-popover.fav-sidebar .close-pop {
+  background:transparent;
+  border:none;
+  color:#cfcfd3;
+  font-weight:700;
+  cursor:pointer;
+}
 
-.fav-popover .empty { padding: 12px; text-align:center; color:#cfcfd3; font-size:13px; }
+/* opcional: evita scroll no body enquanto a drawer estiver aberta */
+body.fav-drawer-open {
+  overflow: hidden;
+}
 
 
         /* Estilos Globais e de Reset */
@@ -112,7 +288,7 @@
     /* imagem de fundo principal com overlay para legibilidade */
     background-image:
       linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
-      url("https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ODY1aWk2ZDN0amFxZHVsYTZlYnFleHllZWVubnp0OHBhajlmcnM2ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xTiTnJx84dFZitpX2g/giphy.gif");
+      url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTNheW01bXd6cmZud2V3M2N5dXY5aW04bzY0YmJ0bWpya3ZnM3dtZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Y2XUgTRHYg9pQ04I7r/giphy.gif");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;           /* cobre toda a viewport */
@@ -142,7 +318,7 @@
   z-index: 5;
 }
 .fav-btn:active{ transform: scale(.96); }
-.fav-btn.active{ background: linear-gradient(180deg,#f0fa64,#ff9400); color: #111; }
+.fav-btn.active{ background: linear-gradient(180deg,#ffb300,#ff9400); color: #111; }
 
 .demand-footer {
   text-align: center;
@@ -150,7 +326,7 @@
   border-top: 1px solid #eee;
   margin-top: 2rem;
 }
-.demand-footer h2 { margin-bottom: 0.6rem; color: #0d0e0d; }
+.demand-footer h2 { margin-bottom: 0.6rem; color: #020202; }
 .demand-btn {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -162,6 +338,115 @@
   font-weight: 700;
   border-radius: 6px;
 }
+/* forçar texto branco no botão da seção Dúvidas ou Sugestões (home) */
+#idea-content .demand-footer .demand-btn {
+  color: #ffffff !important;      /* cor do texto */
+  background-color: #222 !important; /* se quiser mudar o fundo do botão */
+  border-color: #222 !important;
+}
+
+
+/* 1) diminuir opacidade do overlay branco (ajuste alpha entre 0.2 e 0.75) */
+#idea-content,
+#controles-content,
+#outros-content,
+.dual-bg {
+  /* reduz o branco sobreposto para deixar o GIF/foto aparecer por trás */
+  background-image:
+    linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.55)),
+    var(--bg-photo, none),
+    var(--bg-gif, none) !important;
+  /* se usa o #idea-content com um background próprio, garanta o mesmo padrão */
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: center center, center center, center center;
+  background-size: cover, cover, cover;
+}
+
+/* 2) garantir que o "painel branco" ocupe toda a altura da janela/página */
+.page-container,
+#idea-content,
+#controles-content,
+#outros-content {
+  min-height: 100vh;          /* garante altura total da viewport */
+  box-sizing: border-box;
+  /* opcional: dá um padding-bottom grande para garantir que o footer não fique "fora" */
+  padding-bottom: 40px;
+}
+
+/* se algum elemento interno estiver limitando a altura, force também o wrapper principal */
+.idea-content-wrapper {
+  min-height: calc(100vh - 140px); /* ajusta ao header/espacamento (tweak se necessário) */
+}
+
+/* 3) centralizar os "pills" e aumentar o tamanho/espacamento */
+.filters {
+  justify-content: center !important; /* centraliza a linha de filtros */
+  align-items: center;
+  margin-left: 0;      /* remove possíveis offsets */
+}
+
+/* tornar os botões maiores e com label mais legível */
+.filter-btn {
+  font-size: 0.98rem !important;     /* tamanho do texto dos pills */
+  padding: 0.45rem 1rem !important;  /* altura e largura do pill */
+  border-radius: 999px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  letter-spacing: 0.02em;
+}
+
+/* o pill ativo (destaque) — reforçar borda/contraste */
+.filter-btn.active {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+}
+
+/* quando a linha tem muitas colunas, manter centralizado e com wrap confortável */
+.card-grid + .filters,
+.filters + .card-grid {
+  margin-top: 1rem;
+}
+
+/* 4) aumentar e escurecer textos para leitura (descrições e categorias) */
+.idea-content-wrapper p,
+.idea-content-wrapper ul,
+.idea-content-wrapper li {
+  font-size: 1.02rem !important; /* aumenta o texto corporal */
+  color: #333 !important;         /* escurece para melhor leitura */
+  line-height: 1.7;
+}
+
+/* barras de seção (títulos coloridos) — mantém contraste e legibilidade */
+.section-bar {
+  color: #07110a !important;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* categoria pequena abaixo do título do dash ("GESTÃO") */
+.tool-card-category {
+  font-size: 0.88rem !important; /* aumentar um pouco */
+  color: #555 !important;        /* mais escuro */
+  font-weight: 700 !important;
+  margin-top: 6px;
+  letter-spacing: 0.06em;
+}
+
+/* título do card (link) — um pouco maior e com mais contraste */
+.tool-card-title a {
+  font-size: 0.98rem !important;
+  color: #222 !important;
+  font-weight: 700;
+}
+
+/* aumenta um pouco o ícone de cada pill (responsivo) */
+@media (min-width: 900px) {
+  .filter-btn { font-size: 1.02rem !important; padding: 0.5rem 1.1rem !important; }
+  .card-grid { gap: 3rem 2.5rem; }
+}
+
+/* 5) opção: se você quiser ainda mais "transparência" do branco, ajuste aqui */
+/* Ex.: rgba(255,255,255,0.45) fica mais translúcido; 0.25 bem translúcido */
+
 .demand-btn:active { transform: translateY(1px); }
 
         a {
@@ -199,25 +484,8 @@
             padding: 0.1rem 2.0rem;
         }
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
 
-        .logo-area img {
-            width: 50px;
-            height: 60px;
-            border-radius: 8px;
-        }
-
-
-        .logo-text-main {
-            font-weight: 790;
-            letter-spacing: 0.10em;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
+        
         
         header nav {
             display: none;
@@ -228,114 +496,6 @@
                 padding: 0.1rem 1rem;
             }
         }
-.modern-navbar .fab { display: none !important; }
-        .modern-navbar {
-            position: fixed;
-            bottom: 30px;
-            left: 70%;
-            transform: translateX(-50%);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            pointer-events: none; /* evita problemas com overlays; itens individuais habilitam pointer-events */
-        }
-
-        
-        /* O "pill" escuro que contém os itens */
-        .modern-navbar .nav-pill {
-            pointer-events: auto;
-            background: linear-gradient(180deg,#101113,#101113);
-            color: #fff;
-            border-radius: 999px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 8px 20px rgba(2,6,23,0.45);
-            border: #101113;
-            min-width: 260px;
-            max-width: 420px;
-        }
-
-        /* Cada item dentro do pill */
-.modern-navbar .nav-item {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: #cfcfd3;
-  font-weight: 600;
-  background: #ffffff1f;
-  cursor: pointer;
-  transition: all .18s ease;
-}
-        /* Ícone dentro do item */
-        .modern-navbar .nav-item .icon {
-            font-size: 1.30rem;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Label (texto) - visível apenas no item ativo */
-        .modern-navbar .nav-item .label {
-            font-size: 0.95rem;
-            display: inline-block;
-            opacity: 0;
-            transform: translateX(-6px);
-            transition: opacity .18s ease, transform .18s ease;
-            white-space: nowrap;
-        }
-
-        /* Estado ativo: chip claro (parecido com a imagem) */
-        .modern-navbar .nav-item.active {
-            background: linear-gradient(180deg,#f0fa64,#f0fa64);
-            color: #0a0909;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.55);
-            transform: translateY(-2px);
-        }
-
-        /* Ao ativar, mostra o label */
-        .modern-navbar .nav-item.active .label {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Itens não ativos: reduz opacidade dos labels */
-        .modern-navbar .nav-item:not(.active) .icon { color: #f0fa64; }
-
-        /* FAB laranja no lado direito */
-        .modern-navbar .fab {
-            pointer-events: auto;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(180deg,#ff7b00,#ff5c00);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(255,92,0,0.24);
-            border: 5px solid rgba(166, 248, 15, 0.06);
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: transform .15s ease;
-        }
-
-        /* Pressing effect FAB */
-        .modern-navbar .fab:active { transform: scale(.96); }
-
-        /* Mobile adjustments */
-        @media (max-width: 420px) {
-            .modern-navbar { gap: 8px; bottom: 14px; }
-            .modern-navbar .nav-pill { min-width: 200px; padding: 6px; }
-            .modern-navbar .nav-item { padding: 6px 8px; }
-        }
-
         /* Conteúdo em geral (Mantido o seu CSS original, apenas reorganizado) */
         /* ... outros estilos mantidos ... */
         
@@ -343,7 +503,7 @@
 
         .hero {
             height: 200px;
-            background: url("https://img.freepik.com/vetores-gratis/plano-de-fundo-da-area-de-trabalho-moderno-vetor-de-desenho-geometrico-azul_53876-135923.jpg")
+            background: url("https://exame.com/insight/_next/image?url=https%3A%2F%2Fclassic.exame.com%2Fwp-content%2Fuploads%2F2021%2F08%2FIMG_6924site.jpg&w=1920&q=75")
                 center/cover no-repeat;
             display: flex;
             align-items: center;
@@ -365,7 +525,7 @@
 
   /* ajuste visual: overlay para legibilidade do texto (opcional) */
   background-image:
-    linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+    linear-gradient(rgba(255, 255, 255, 0.507), rgba(253, 250, 250, 0.329)),
     url("https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bHhwa2J0OWRjcHEyZDkxbWxpbmw1NDZ3c3Ryb3pqOTY1MTZwd2s1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o85xCMrjIbG6F18xq/giphy.gifhttps://img.freepik.com/vetores-gratis/fundo-monocromatico-branco-estilo-papel_23-2149009214.jpg?semt=ais_hybrid&w=740&q=80"); /* <- substitua pela sua foto (jpg/png/webp) */
 
   background-repeat: no-repeat;
@@ -422,10 +582,10 @@
         /* ====== FAIXA VERDE ====== */
 
         .section-bar {
-            background: #f0fa64;
+            background: #41b96f;
             text-align: center;
             padding: 0.65rem 1rem;
-            color: #050505;
+            color: #fff;
             font-size: 1.4rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -513,35 +673,42 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #646464;
+            color: #777;
         }
 
         /* ====== FILTRO ====== */
 
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1.8rem;
-            margin-bottom: 0.3rem;
-            font-size: 0.85rem;
-        }
+       /* centered filters */
+/* substitua a regra .filters atual por isto (cole ao final do seu <style>) */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.8rem auto 0.3rem;
+  font-size: 0.95rem;
+
+  justify-content: center;
+  max-width: 1200px;    /* aumentei de 980px para 1200px */
+  padding: 0 12px;
+}
+
+
 
         .filter-btn {
             border-radius: 999px;
-            color: #0c0c0c;
+            color: #ffffff;
             border-color: #ee0a0a;
-            border: 1px solid #0c0c0c;
+            border: 1px solid #FFA200;
             padding: 0.3rem 0.8rem;
-            background: #ffffff;
+            background: #2D2E30;
             cursor: pointer;
             transition: background 0.15s ease-out, border-color 0.15s ease-out;
         }
 
         .filter-btn.active {
-            background: #f0fa64;
-            border-color: #f0fa64;
-            color: #020202;
+            background: #ffb300;
+            border-color: #ffb300;
+            color: #000000;
             font-weight: 600;
         }
 
@@ -554,7 +721,7 @@
 
         .idea-content-wrapper h2 {
             font-size: 1.8rem;
-            color: #0a0a0a;
+            color: #41b96f;
             margin-top: 1.5rem;
             text-align: center;
             font-weight: 700;
@@ -613,7 +780,7 @@
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #f0fa64;
+            border: 4px solid #ffb300;
             margin-bottom: 0.5rem;
         }
 
@@ -651,6 +818,18 @@
 
 
         /* ====== RESPONSIVO ====== */
+@media (max-width: 520px) {
+  .filters {
+    justify-content: flex-start;  /* facilita leitura no mobile */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .filters::-webkit-scrollbar { display: none; } /* opcional: esconde scrollbar no webkit */
+}
+
 
         @media (max-width: 768px) {
             .hero {
@@ -677,60 +856,174 @@
         }
     }
         /* --- Texto (label) das abas INATIVAS */
-.modern-navbar .nav-item:not(.active) .label {
-  color: #cbcbd6;      /* cor do texto inativo — ajuste para o hex que quiser */
-  opacity: 0.95;       /* se quiser que o label esteja visível (por padrão é 0) */
-  transform: translateX(0); /* opcional: remove o deslocamento se desejar */
-}
 
 /* --- Ícone das abas INATIVAS (separado) */
-.modern-navbar .nav-item:not(.active) .icon {
-  color: #f0fa64;      /* cor do ícone inativo — já tem na sua folha, manter/alterar aqui */
+
+/* ====== FORÇA de estilo para textos da HOME (cole ao final do <style>) ====== */
+
+/* Texto do corpo (parágrafos, listas) dentro da home */
+#idea-content,
+#idea-content .idea-content-wrapper,
+#idea-content .idea-content-wrapper p,
+#idea-content .idea-content-wrapper ul,
+#idea-content .idea-content-wrapper li {
+  font-size: 1.05rem !important;   /* ajuste conforme quiser */
+  color: #222 !important;          /* mais escuro para melhor leitura */
+  line-height: 1.75 !important;
+  font-weight: 500 !important;
 }
 
-/* --- Garante cor desejada para o item ativo (texto + ícone) */
-.modern-navbar .nav-item.active,
-.modern-navbar .nav-item.active .label,
-.modern-navbar .nav-item.active .icon {
-  color: #0a0909;      /* cor atual que você usa para o estado ativo */
+/* Títulos principais / subtítulos dentro da home */
+#idea-content h1,
+#idea-content h2,
+#idea-content h3,
+#idea-content .section-bar {
+  color: #0e2a17 !important;       /* tom escuro e legível */
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
 }
 
-/* Se regras existentes estiverem com mais especificidade use !important (usar somente se necessário) */
-/* .modern-navbar .nav-item:not(.active) .label { color: #cfcfd3 !important; } */
+/* Ajuste de tamanho dos h2/h3 (tweak conforme preferir) */
+#idea-content h1 { font-size: 2.0rem !important; }
+#idea-content h2 { font-size: 1.6rem !important; }
+#idea-content h3 { font-size: 1.25rem !important; }
+
+/* Cabeçalho da seção verde/amarela (mantém altura e centragem) */
+#idea-content .section-bar {
+  font-size: 1.1rem !important;
+  padding: 0.6rem 1.2rem !important;
+  text-align: center !important;
+  border-radius: 18px !important;
+}
+
+/* Texto de créditos/rodapé dentro da seção */
+#idea-content .demand-footer p,
+#idea-content .demand-footer a {
+  font-size: 0.95rem !important;
+  color: #333 !important;
+}
+
+/* Se houver textos dentro do 'hero' (banner) */
+#idea-content .hero h1,
+#idea-content .hero p {
+  color: #fff !important;         /* assume hero tem overlay escuro */
+  text-shadow: 0 2px 6px rgba(0,0,0,0.45) !important;
+}
+
+/* Se os textos tiverem estilos inline ou regras com maior especificidade,
+   este seletor global força a aplicação na HOME (use apenas se necessário) */
+#idea-content * {
+  color: inherit !important;
+}
+
+/* Responsivo: ajustar tamanhos para telas pequenas */
+@media (max-width: 768px) {
+  #idea-content .idea-content-wrapper p,
+  #idea-content .idea-content-wrapper ul,
+  #idea-content .idea-content-wrapper li {
+    font-size: 1.01rem !important;
+    line-height: 1.6 !important;
+  }
+  #idea-content h1 { font-size: 1.6rem !important; }
+  #idea-content h2 { font-size: 1.2rem !important; }
+}
+
+/* bloco final da home — ocupa toda a largura e mostra a imagem inteira */
+#idea-content #home-end-image {
+  width: 100%;
+  display: block;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* usa <img> para garantir que a imagem não seja recortada */
+#idea-content #home-end-image img {
+  display: block;
+  width: 100%;        /* ocupa toda a largura do viewport/content */
+  height: auto;       /* mantém proporção e mostra a imagem inteira */
+  max-height: 1620px;  /* limite de altura (ajuste conforme preferir) */
+  object-fit: contain;/* garante que a imagem inteira apareça sem cortar */
+  margin: 0 auto;
+}
+
+/* responsivo: menor altura em celular */
+@media (max-width: 900px) {
+  #idea-content #home-end-image img { max-height: 240px; }
+}
+@media (max-width: 420px) {
+  #idea-content #home-end-image img { max-height: 160px; }
+}
+/* Banner topo — usa imagem como background para comportamento de banner */
+/* Banner: imagem responsiva, sem cortar, sempre 100% largura */
+#home-top-banner {
+  width: 100%;
+  max-width: 3200px;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #fff;
+}
+#home-top-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center top;
+  max-height: 820px;
+}
+@media (max-width: 900px) {
+  #home-top-banner img { max-height: 420px; }
+}
+@media (max-width: 420px) {
+  #home-top-banner img { max-height: 300px; }
+}
 
     </style>
     
 </head>
 
 <body>
-    
-    <header>
-        <div class="header-inner">
-            <a class="logo-area" href="#idea">
-                <img src="https://i.ibb.co/0yQDG7QG/image.png" alt="image">
-                <div class="logo-text">
-                    <div class="logo-text-main blank animated">Site Teste</div>
-                </div>
-            </a>
+    <!-- SIDEBAR LATERAL -->
+<aside class="sidebar" id="mainSidebar" aria-label="Navegação lateral">
+  <div class="logo">
+    <img src="https://i.ibb.co/XZGKX5pF/image.png" alt="logo">
+    <div class="title">CONTROL TOWER - SP10</div>
+  </div>
 
-            </div>
-    </header>
+  <nav id="sidebarNav" role="navigation">
+    <a href="#" class="nav-link" data-content-id="idea"><i class='bx bxs-home'></i><span class="label">Home</span></a>
+    <a href="#" class="nav-link active" data-content-id="controles"><i class='bx bxs-dashboard'></i><span class="label">Controles</span></a>
+    <a href="#" class="nav-link" data-content-id="outros"><i class='bx bxs-layer'></i><span class="label">Outros</span></a>
+    <a href="#" class="nav-link" data-action="favorites"><i class='bx bxs-star'></i><span class="label">Favoritos</span></a>
+    <a href="#" class="nav-link" data-action="docs"><i class='bx bxs-file-doc'></i><span class="label">Doc</span></a>
+  </nav>
+
+  <button class="collapse-btn" id="sidebarCollapseBtn" title="Recolher / Expandir">☰</button>
+</aside>
+
     
     <div class="page-container">
         <section id="idea-content" class="idea-content-wrapper">
-            
-            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">O que é Control Tower?</div>
+            <div id="home-top-banner">
+  <img src="https://i.ibb.co/bjySPP3G/image.png" alt="Banner" />
+</div>
+
+
+            <div class="section-bar" style="background: #41B96F; color: #080808; border-radius: 20px;">O que é Control Tower?</div>
 
             <p>A torre de controle é uma biblioteca criada pela área de ID/EA (Inteligente Data & Execution Analysis), que é responsável por realizar, analisar e desenvolver ferramentas de controle para melhores resultados operacionais. Aqui você encontrará todas as ferramentas desenvolvidas por ID/EA separadas por área, você pode encontrá-las na parte superior direita desse site (ou superior esquerdo para celular).</p>
 
-            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">O que o time de LMS faz?</div>
+            <div class="section-bar" style="background: #FFB300; color: #080808; border-radius: 20px;">O que o time de LMS faz?</div>
 
             <p>O time de LMS é responsável pela gestão operacional de pessoas e capacidade, garantindo o equilíbrio entre demanda, produtividade e disponibilidade das equipes. Atua diretamente no controle e análise de HC (headcount), movimentações de pessoas (entradas e desligamentos), absenteísmo (ABS) e demais indicadores de força de trabalho.<br>
 
-</p>
+Além disso, o time suporta os Team Leaders, intermediando temas relacionados a usuários junto à Ops e ABM, e é responsável por toda a gestão de horas. Isso inclui o acompanhamento de Available Time, CIA e COA, EIT, Attendance e volumetrias, assegurando visibilidade, conformidade e eficiência operacional.</p>
 
 
-            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">Qual é o nosso objetivo?</div>
+            <div class="section-bar" style="background: #41B96F; color: #222; border-radius: 20px;">Qual é o nosso objetivo?</div>
 
             <p>O nosso objetivo é fornecer dados operacionais em tempo real através de várias ferramentas criadas por nós mesmos de forma simplificada para melhorar a eficiência da operação, identificando lacunas de melhorias tanto na produtividade quanto no desempenho. Além disso, ajudamos a elaborar planos de ação caso algum indicador se desvie dos padrões esperados. Sendo os principais focos:</p>
             
@@ -742,22 +1035,22 @@
                 <li>Melhorar o desempenho operacional com a criação de novos KPIs.</li>
             </ul>
 
-            <div class="section-bar" style="background: #f0fa64; color: #070707; border-radius: 20px;">Nosso time:</div>
+            <div class="section-bar" style="background: #FFB300; color: #030303; border-radius: 20px;">Nosso time:</div>
 
             <div class="idea-team-wrapper">
                 
                 <div class="team-section">
-                    <h3 style="margin-top: 0;">Gerente e Supervisor</h3>
+                    <h3 style="margin-top: 0;">Gerente e Supervisor(a)</h3>
                     <div class="team-row">
                         <div class="team-member">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>Manager</small>
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
                         <div class="team-member">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>Supervisor</small>
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
                     </div>
                 </div>
@@ -766,14 +1059,14 @@
                     <h3>Team Leader e Analista</h3>
                     <div class="team-row">
                         <div class="team-member">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>Team Leader Sr</small>
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
                         <div class="team-member">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>Analista SSR</small>
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
                     </div>
                 </div>
@@ -783,131 +1076,146 @@
                     <div class="team-row">
                         
                         <div class="team-member"
-                        data-name="Nome aqui"
-                        data-role="T1 - ID/EA Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets">
-                        <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T1 - ID/EA Assistant</small>
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
 
+                       
+                        <div class="team-member"
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
+                        </div>
                         
                         <div class="team-member"
-                        data-name="Nome aqui"
-                         data-role="T1 - LMS Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T1 - LMS Assistant</small>
-
-
-                        </div>
-                        <div class="team-member"
-                        data-name="Nome aqui"
-                         data-role="T1 - ID/EA Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T1. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets"
-
-                        >
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T1 - ID/EA Assistant</small>
-                        </div>
-
-
-                        <div class="team-member"
-                            data-name="Nome aqui"
-                            data-role="T2 - ID/EA Assistant"
-                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                            data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, HTML/CSS/JS para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                            data-tools="BigQuery, Looker Studio, Google Sheets, HTML, CSS, JavaScript, Python, R, C#, Appscript">
-                        <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                        <p>Nome aqui</p>
-                        <small>T2 - ID/EA Assistant</small>
-                        </div>
-
-
-                        <div class="team-member"
-                             data-name="Nome aqui"
-                            data-role="T2 - ID/EA Assistant"
-                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                            data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                            data-tools="BigQuery, Looker Studio, Google Sheets, Python"
-                            >
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T2 - ID/EA Assistant</small>
-                        </div>
-
-
-                        <div class="team-member"
-                            data-name="Nome aqui"
-                            data-role="T2 - LMS Assistant"
-                            data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                            data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T2. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery, python, HTML/CSS/JS e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                            data-tools="BigQuery, Looker Studio, Google Sheets, Python, HTML, CSS, JavaScript, Appscript">
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T2 - LMS Assistant</small>
-                        </div>
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
                         
-
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
+                        </div>
 
                         <div class="team-member"
-                         data-name="Nome aqui"
-                         data-role="T3 - ID/EA Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets"
-                            >
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T3 - ID/EA Assistant</small>
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
+                        </div>
+
+                        <div class="team-member"
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
 
 
                         <div class="team-member"
-                         data-name="Nome aqui"
-                         data-role="T3 - ID/EA Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de Control Tower no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets"
-                        >
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T3 - ID/EA Assistant</small>
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
+                        </div>
+
+
+
+                        <div class="team-member"
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
 
 
                         <div class="team-member"
-                         data-name="Nome aqui"
-                         data-role="T3 - LMS Assistant"
-                        data-photo="https://i.ibb.co/Y40vGrqC/image.png"
-                        data-bio="Olá, meu nome é ..., e sou assistente do time de LMS no T3. Atuo no desenvolvimento de dashboards e relatórios operacionais, utilizando BigQuery e sheets para processar e analisar dados, otimizando eficiência nas consultas e visualizações."
-                        data-tools="BigQuery, Looker Studio, Google Sheets"
-                        >
-                            <img src="https://i.ibb.co/Y40vGrqC/image.png" alt="Nome aqui">
-                            <p>Nome aqui</p>
-                            <small>T3 - LMS Assistant</small>
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
+                        </div>
+
+
+                        <div class="team-member"
+                          data-name="Nome"
+                          data-role="Cargo"
+                          data-photo="https://i.ibb.co/Mx4ZySsd/image.png"
+                          data-bio="Descrição"
+                          data-tools="Ferramentas que domina">
+                        
+                            <img src="https://i.ibb.co/Mx4ZySsd/image.png" alt="Nome">
+                            <p>Nome</p>
+                            <small>Cargo</small>
                         </div>
                     </div>
                 </div>
                 
             </div>
-            
+            <div style="width:360px;height:60px;
+            border:3px solid #41B96F;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:2rem auto;
+            border-radius:6px;
+            background:#41B96F">
+
+  <span style="font-size:28px;font-weight:800;color:#222">
+    Total de acessos: <?= visitCount ?>
+  </span>
+
+</div>
+
             <div class="demand-footer">
                 <h2>Dúvidas ou Sugestões?</h2>
                 <div style="margin-top: 1rem;">
-                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                    <a class="demand-btn" href="" target="_blank" rel="noopener noreferrer">Solicitação de Projeto</a>
                 </div>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
+                <p style="font-size: 3.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
             </div>
+            
         </section>
 
         <section id="outros-content" class="hidden"> 
@@ -923,55 +1231,68 @@
                 
                 <section class="card-grid" id="icqaGrid">
                     
-                    <article class="tool-card" data-category="ICQA" data-name="DASH 1">
+                    <article class="tool-card" data-category="DASH1" data-name="DASH1">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 1">
+                                <img class="tool-card-img" alt="FPP">
                             </div>
                             
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 1</a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH1</a>
                         </div>
-                        <div class="tool-card-category">Categoria do Dash 1</div>
+                        <div class="tool-card-category">DASH1</div>
                     </article>
 
-                    <article class="tool-card" data-category="ICQA" data-name="DASH 2">
+                    <article class="tool-card" data-category="DASH2" data-name="DASH2">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 2">
+                                <img class="tool-card-img" alt="FPP">
                             </div>
+                            
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 2</a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH2</a>
                         </div>
-                        <div class="tool-card-category">Categoria do Dash 2</div>
+                        <div class="tool-card-category">DASH2</div>
                     </article>
 
-                    <article class="tool-card" data-category="ICQA" data-name="DASH 3">
+                    <article class="tool-card" data-category="DASH3" data-name="DASH3">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 3">
+                                <img class="tool-card-img" alt="FPP">
                             </div>
+                            
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 3</a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH3</a>
                         </div>
-                        <div class="tool-card-category">Categoria do Dash 3</div>
+                        <div class="tool-card-category">DASH3</div>
                     </article>
 
-                    <article class="tool-card" data-category="ICQA" data-name="DASH 4">
+                    <article class="tool-card" data-category="DASH4" data-name="DASH4">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 4">
+                                <img class="tool-card-img" alt="FPP">
                             </div>
+                            
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 4</a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH4</a>
                         </div>
-                        <div class="tool-card-category">Categoria do Dash 4</div>
+                        <div class="tool-card-category">DASH4</div>
                     </article>
                     
+
+                                        
+
+
+
+
                 </section>
             </main>
 
@@ -979,7 +1300,7 @@
             <div class="demand-footer">
                 <h2>Dúvidas ou Sugestões?</h2>
                 <div style="margin-top: 1rem;">
-                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                    <a class="demand-btn" href="" target="_blank" rel="noopener noreferrer">Solicitação de Projeto</a>
                 </div>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
@@ -997,666 +1318,420 @@
             <main class="page-wrapper">
                 <div class="filters">
                     <button class="filter-btn active" data-filter="all">Todos</button>
-                    <button class="filter-btn" data-filter="Categoria 2">Categoria 2</button>
-                    <button class="filter-btn" data-filter="Categoria 3">Categoria 3</button>
-                    <button class="filter-btn" data-filter="Categoria 4">Categoria 4</button>
-                    <button class="filter-btn" data-filter="Categoria 5">Categoria 5</button>
-                    <button class="filter-btn" data-filter="Categoria 6">Categoria 6</button>
-                    <button class="filter-btn" data-filter="Categoria 7">Categoria 7</button>
-                    <button class="filter-btn" data-filter="Categoria 8">Categoria 8</button>
-                    <button class="filter-btn" data-filter="Categoria 9">Categoria 9</button>
+                    <button class="filter-btn" data-filter="Gestão">Gestão</button>
+                    <button class="filter-btn" data-filter="Control Tower">Control Tower</button>
+                    <button class="filter-btn" data-filter="Gestão LMS">Gestão LMS</button>
+                    <button class="filter-btn" data-filter="Picking">Picking</button>
+                    <button class="filter-btn" data-filter="Packing">Packing</button>
+                    <button class="filter-btn" data-filter="Shipping">Shipping</button>
+                    <!--<button class="filter-btn" data-filter="Putaway">Putaway</button>-->
+                    <button class="filter-btn" data-filter="Safety">Safety</button>
+                    <div class="search-container" style="margin-left: 10px; display: flex; align-items: center;">
+    <input type="text" id="toolSearch" placeholder="Pesquisar Dashboard" 
+           style="padding: 0.45rem 1rem; border-radius: 999px; border: 1px solid #FFA200; background: #2D2E30; color: #fff; outline: none; width: 200px;">
+</div>
                 </div>
 
                 <section class="card-grid" id="toolGrid">
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 5">
+                    <article class="tool-card" data-category="Gestão" data-name="DASH5">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 5">
+                                <img class="tool-card-img" alt="DASH5">
                             </div>
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 5</a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
                         </div>
-                        <div class="tool-card-category">Categoria dash 5</div>
+                        <div class="tool-card-category">Gestão</div>
                     </article>
 
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 6">
+                    <article class="tool-card" data-category="Gestão" data-name="DASH6">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 6">
+                                <img class="tool-card-img" alt="DASH6">
                             </div>
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 6
-                            </a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
                         </div>
-                        <div class="tool-card-category">CATEGORIA DASH 6</div>
+                        <div class="tool-card-category">Gestão</div>
                     </article>
 
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 7">
+                    <article class="tool-card" data-category="Gestão" data-name="DASH7">
                         <div class="tool-card-icon-wrapper">
                             <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 7">
+                                <img class="tool-card-img" alt="DASH7">
                             </div>
                         </div>
                         <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 7
-                            </a>
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
                         </div>
-                        <div class="tool-card-category">CATEGORIA DASH 7</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 8">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 8">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 8
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 8</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 9">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 9">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 9
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 9</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 10">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 10">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">DASH 10</a>
-                        </div>
-                        <div class="tool-card-category">DASH 10</div>
-                    </article>
-
-
-                    
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 11">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 11">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 11
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 11</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 12">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 12">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 12
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 12</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 13">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 13">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 13
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 13</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 14">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 14">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 14
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 14</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 15">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 15">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 15
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 15</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 16">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 16">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 16
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 16</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 17">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 17">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 17
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 17</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 2" data-name="DASH 18">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 18">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 18
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 18</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 19">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 19">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 19
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 19</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 20">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 20">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 20
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 20</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 21">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 21">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 21
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 21</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 22">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 22">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 22
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 22</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 3" data-name="DASH 23">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 23">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 23
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 23</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 24">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 24">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 24
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 24</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 25">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 25">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 25
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 25</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 26">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 26">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 26
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 26</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 27">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 27">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 27
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 27</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 28">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 28">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 28
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 28</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 29">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 29">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 29
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 29</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 4" data-name="DASH 30">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 30">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 30
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 30</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 31">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 31">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 31
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 31</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 32">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 32">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 32
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 32</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 33">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 33">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 33
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 33</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 34">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 34">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 34
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 34</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 35">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 35">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 35
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 35</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 36">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 36">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 36
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 36</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 5" data-name="DASH 37">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 37">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 37
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 37</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 38">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 38">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                               DASH 38
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 38</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 39">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 39">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 39
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 39</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 40">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 40">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 40
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 40</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 41">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 41">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 41
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 41</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 6" data-name="DASH 42">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 42">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 42
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 42</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 43">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 43">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 43
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 43</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 44">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 44">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 44
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 44</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 45">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 45">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 45
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 45</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 46">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 46">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 46
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 46</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 7" data-name="DASH 47">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 47">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 47
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 47</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 8" data-name="DASH 48">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 48">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 48
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 48</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 9" data-name="DASH 49">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 49">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                                DASH 49
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 49</div>
-                    </article>
-
-                    <article class="tool-card" data-category="Categoria 9" data-name="DASH 50">
-                        <div class="tool-card-icon-wrapper">
-                            <div class="tool-card-icon">
-                                <img class="tool-card-img" alt="DASH 50">
-                            </div>
-                        </div>
-                        <div class="tool-card-title">
-                            <a href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true">
-                               DASH 50
-                            </a>
-                        </div>
-                        <div class="tool-card-category">CATEGORIA DASH 50</div>
+                        <div class="tool-card-category">Gestão</div>
                     </article>
                     
+                    <article class="tool-card" data-category="Gestão" data-name="DASH8">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH8">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH9">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH9">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH10">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH10">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+                    
+                    <article class="tool-card" data-category="Gestão" data-name="DASH11">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH11">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH12">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH12">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH13">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH13">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH14">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH14">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH15">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH15">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH16">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH16">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH17">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH17">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH18">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH18">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH19">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH19">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH20">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH20">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH21">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH21">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH22">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH22">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH23">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH23">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH24">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH24">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH25">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH25">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH26">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH26">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH27">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH27">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH28">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH28">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH29">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH29">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH30">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH30">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH31">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH31">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH32">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH32">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH33">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH33">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    <article class="tool-card" data-category="Gestão" data-name="DASH34">
+                        <div class="tool-card-icon-wrapper">
+                            <div class="tool-card-icon">
+                                <img class="tool-card-img" alt="DASH34">
+                            </div>
+                        </div>
+                        <div class="tool-card-title">
+                            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07OTzRSvb2qN51n_gHTF6SqCKur3N5mvkZQ&s"
+                            target="_blank" rel="noopener noreferrer">DASH</a>
+                        </div>
+                        <div class="tool-card-category">Gestão</div>
+                    </article>
+
+                    
+
                 </section>
             </main>
 
             <div class="demand-footer">
                 <h2>Dúvidas ou Sugestões?</h2>
                 <div style="margin-top: 1rem;">
-                    <a class="demand-btn" href="https://isinaliza.vtexassets.com/arquivos/ids/173952-800-auto?v=636848933160370000&width=800&height=auto&aspect=true" target="_blank" rel="noopener noreferrer">Solicitação de Demanda</a>
+                    <a class="demand-btn" href="" target="_blank" rel="noopener noreferrer">Solicitação de Projeto</a>
                 </div>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">emailaqui@gmail.com</p>
@@ -1667,93 +1742,46 @@
 
     <!-- NAVBAR -->
      
-    <div class="modern-navbar" aria-hidden="false">
-      <div class="nav-pill" role="tablist" aria-label="Navegação principal">
-<button class="nav-item" data-content-id="idea" role="tab" aria-selected="false">
-  <span class="icon"><i class='bx bxs-home'></i></span>
-  <span class="label">Home</span>
-</button>
-
-<button class="nav-item active" data-content-id="controles" role="tab" aria-selected="true">
-  <span class="icon"><i class='bx bxs-dashboard'></i></span>
-  <span class="label">Controles</span>
-</button>
-        <button class="nav-item" data-content-id="outros" role="tab" aria-selected="false">
-          <span class="icon"><i class='bx bxs-layer'></i></span>
-          <span class="label">Outros</span>
-        </button>
-
-<button class="nav-item" data-action="favorites" role="button" title="Favoritos">
-  <span class="icon"><i class='bx bxs-star'></i></span>
-  <span class="label">Favoritos</span>
-</button>
-
-        <button class="nav-item" data-action="docs" role="button" title="Documentação">
-          <span class="icon"><i class='bx bxs-file-doc'></i></span>
-          <span class="label">Doc</span>
-        </button>
-      </div>
-      
-
-      <!-- Botão laranja flutuante (FAB) -->
-      <button class="fab" title="Ações">
-        <i class='bx bxs-star'></i>
-      </button>
-    </div>
 
     <script>
         const ICON_MAP = {
-            "DASH 5": "https://i.ibb.co/8DfzH8nS/image.png",
-            "DASH 6": "https://i.ibb.co/JRQML5HS/image.png",
-            "DASH 7": "https://i.ibb.co/JRQML5HS/image.png",
-            "DASH 8": "https://i.ibb.co/1fjh4Mv3/image.png",
-            "DASH 9": "https://i.ibb.co/XZwxVq1M/image.png",
-            "DASH 10": "https://i.ibb.co/rfpV77g8/image.png",
-            "DASH 11": "https://i.ibb.co/KpQYp3nK/image.png",
-            "DASH 12": "https://i.ibb.co/B5YpCV2w/image.png",
-            "DASH 13": "https://i.ibb.co/LDWzCjyv/image.png",
-            "DASH 14": "https://i.ibb.co/6JVxjJBX/image.png",
-            "DASH 15": "https://i.ibb.co/DnJb662/image.png",
-            "DASH 16": "https://i.ibb.co/GvdV2xWP/image.png",
-            "DASH 17": "https://i.ibb.co/kCHTtRr/image.png",
-            "DASH 18": "https://i.ibb.co/WNy0zmKQ/image.png",
-            "DASH 19": "https://i.ibb.co/v4GKSTG9/image.png",
-            "DASH 20": "https://i.ibb.co/hxbH8cdP/image.png",
-            "DASH 21": "https://i.ibb.co/JjKB8dDK/image.png",
-            "DASH 22": "https://i.ibb.co/Sw9Msf4w/image.png",
-            "DASH 23": "https://i.ibb.co/kVLkgzDh/image.png",
-            "DASH 24": "https://i.ibb.co/xK0MF871/image.png",
-            "DASH 25": "https://i.ibb.co/k2xpCHG9/image.png",
-            "DASH 26": "https://i.ibb.co/C3N5JBJY/image.png",
-            "DASH 27": "https://i.ibb.co/mCMycf6W/image.png",
-            "DASH 28": "https://i.ibb.co/JR9bf1bQ/image.png",
-            "DASH 29": "https://i.ibb.co/fV66VWdh/image.png",
-            "DASH 30": "https://i.ibb.co/WNtLGkqQ/image.png",
-            "DASH 31": "https://i.ibb.co/23yGnXwr/image.png",
-            "DASH 32": "https://i.ibb.co/fRq1vmp/image.png",
-            "DASH 33": "https://i.ibb.co/SXcvngb3/image.png",
-            "DASH 34": "https://i.ibb.co/vx8MgcVq/image.png",
-            "DASH 35": "https://i.ibb.co/LD7Ns7Zx/image.png",
-            "DASH 36": "https://i.ibb.co/N6s5YXGR/image.png",
-            "DASH 37": "https://i.ibb.co/20CQv5X7/image.png",
-            "DASH 38": "https://i.ibb.co/ds2Nd07n/image.png",
-            "DASH 39": "https://i.ibb.co/KzDWFm3Q/image.png",
-            "DASH 40": "https://i.ibb.co/1tfyFf1S/image.png",
-            "DASH 41": "https://i.ibb.co/cGxfYGR/image.png",
-            "DASH 42": "https://i.ibb.co/B2jWfXLb/image.png",
-            "DASH 43": "https://i.ibb.co/tpmzDK9R/image.png",
-            "DASH 44": "https://i.ibb.co/Hfyg5qVD/image.png",
-            "DASH 45": "https://i.ibb.co/v5DX11r/image.png",
-            "DASH 46": "https://i.ibb.co/ycNPQQNS/image.png",
-            "DASH 47": "https://i.ibb.co/v4CWHxrT/image.png",
-            "DASH 48": "https://i.ibb.co/NdGMLYH7/image.png",
-            "DASH 49": "https://i.ibb.co/YFFzFQLw/image.png",
-            "DASH 50": "https://i.ibb.co/wFW5y1SD/image.png",
-            "DASH 1": "https://i.ibb.co/848cg7DG/image.png",
-            "DASH 2": "https://i.ibb.co/PGvhrQsL/image.png",
-            "DASH 3": "https://i.ibb.co/C5gQv1zf/image.png",
-            "DASH 4": "https://i.ibb.co/NdLRzvLH/image.png"
-        };
+            "DASH1": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH2": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH3": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH4": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH5": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH6": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH7": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH8": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH9": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH10": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH11": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH12": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH13": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH14": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH15": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH16": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH17": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH18": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH19": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH20": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH21": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH22": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH23": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH24": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH25": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH26": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH27": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH28": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH29": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH30": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH31": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH32": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH33": "https://i.ibb.co/gb2zdC7K/image.png",
+            "DASH34": "https://i.ibb.co/gb2zdC7K/image.png"
+
+
+          };
 
         function loadIconsManually() {
             // Seleciona todos os cards em TODAS as seções que carregam ícones
@@ -1771,25 +1799,67 @@
                 }
             });
         }
-        
-        const filterButtons = document.querySelectorAll("#controles-content .filter-btn");
-        const toolCards = document.querySelectorAll("#controles-content .tool-card");
-        
-        // Lógica do Filtro por categoria
-        filterButtons.forEach(btn => {
-            btn.addEventListener("click", () => {
-                filterButtons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
 
-                const filter = btn.dataset.filter;
+        function sortCardsAlphabetically() {
+    // Seleciona os grids que contêm os cards
+    const grids = document.querySelectorAll('#toolGrid, #icqaGrid');
 
-                toolCards.forEach(card => {
-                    const cat = card.dataset.category;
-                    const show = filter === "all" || filter === cat;
-                    card.style.display = show ? "flex" : "none";
-                });
-            });
+    grids.forEach(grid => {
+        // Transforma a NodeList de cards em um Array para podermos ordenar
+        const cards = Array.from(grid.querySelectorAll('.tool-card'));
+
+        // Ordena o array baseado no data-name (ignorando maiúsculas/minúsculas)
+        cards.sort((a, b) => {
+            const nameA = (a.dataset.name || "").toLowerCase();
+            const nameB = (b.dataset.name || "").toLowerCase();
+            return nameA.localeCompare(nameB, 'pt-BR', { sensitivity: 'base' });
         });
+
+        // Limpa o grid e reinsere os cards na nova ordem
+        cards.forEach(card => grid.appendChild(card));
+    });
+}
+
+// Chame a função quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', sortCardsAlphabetically);
+
+        const filterButtons = document.querySelectorAll("#controles-content .filter-btn");
+const toolCards = document.querySelectorAll("#controles-content .tool-card");
+const toolSearch = document.getElementById("toolSearch");
+
+function filterTools() {
+    const activeBtn = document.querySelector("#controles-content .filter-btn.active");
+    const categoryFilter = activeBtn ? activeBtn.dataset.filter : "all";
+    const searchText = toolSearch.value.toLowerCase().trim();
+
+    toolCards.forEach(card => {
+        const cardCategory = card.dataset.category;
+        const cardName = (card.dataset.name || "").toLowerCase();
+        
+        // Verifica categoria
+        const matchesCategory = (categoryFilter === "all" || categoryFilter === cardCategory);
+        // Verifica busca por texto
+        const matchesSearch = cardName.includes(searchText);
+
+        if (matchesCategory && matchesSearch) {
+            card.style.display = "flex";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+
+// Evento para os botões de filtro
+filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterTools();
+    });
+});
+
+// Evento para a barra de pesquisa (digitação)
+toolSearch.addEventListener("input", filterTools);
 
         document.querySelectorAll(".tool-card").forEach(card => {
             card.addEventListener("click", () => {
@@ -1818,32 +1888,6 @@
             }
         }
 
-        const navItems = document.querySelectorAll('.modern-navbar .nav-item');
-        const fab = document.querySelector('.modern-navbar .fab');
-
-        function activateNavItem(item) {
-            navItems.forEach(n => {
-                n.classList.remove('active');
-                n.setAttribute('aria-selected', 'false');
-            });
-
-            item.classList.add('active');
-            item.setAttribute('aria-selected', 'true');
-
-            const contentId = item.dataset.contentId;
-            if (contentId) {
-                showContent(contentId);
-            } else if (item.dataset.action === 'docs') {
-                alert('Funcionalidade de Documentação em breve!');
-            }
-        }
-
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                activateNavItem(item);
-            });
-        });
 
         if (fab) {
             fab.addEventListener('click', () => {
@@ -1939,22 +1983,10 @@ function metadataFor(dashId){
 
 /* ======= POPOVER / BADGE CREATION (singletons) ======= */
 function ensurePopoverAndBadge(){
-  const navPill = document.querySelector('.modern-navbar .nav-pill');
-  if(!navPill) return null;
+function ensurePopoverAndBadge(){
 
-  // find or create favNavItem
-  let favNavItem = document.querySelector('.modern-navbar .nav-item[data-action="favorites"]');
-  if(!favNavItem){
-    const favNav = document.createElement('button');
-    favNav.className = 'nav-item';
-    favNav.setAttribute('data-action','favorites');
-    favNav.type = 'button';
-    favNav.innerHTML = '<span class="icon"><i class="bx bxs-star"></i></span><span class="label">Favoritos</span>';
-    const fab = document.querySelector('.modern-navbar .fab');
-    if(fab) navPill.insertBefore(favNav, fab);
-    else navPill.appendChild(favNav);
-    favNavItem = favNav;
-  }
+  let favNavItem = document.querySelector('.sidebar .nav-link[data-action="favorites"]');
+  if(!favNavItem) return null;
 
   // badge
   let badge = favNavItem.querySelector('.fav-badge');
@@ -1964,76 +1996,52 @@ function ensurePopoverAndBadge(){
     favNavItem.appendChild(badge);
   }
 
-  // popover (attach to favNavItem)
-  let pop = favNavItem.querySelector('.fav-popover');
+  // drawer lateral
+  let pop = document.querySelector('.fav-popover.fav-sidebar');
   if(!pop){
     pop = document.createElement('div');
-    pop.className = 'fav-popover';
+    pop.className = 'fav-popover fav-sidebar';
     pop.innerHTML = `
       <div class="header">
         <h4>Meus Favoritos</h4>
-        <button class="close-pop" aria-label="Fechar" title="Fechar" style="background:transparent;border:none;color:#cfcfd3;cursor:pointer;font-weight:700">✕</button>
+        <button class="close-pop" aria-label="Fechar">✕</button>
       </div>
-      <div class="fav-list" role="list"></div>
+      <div class="fav-list"></div>
       <div class="empty" style="display:none">Você ainda não favoritou nenhum item.</div>
     `;
-    favNavItem.appendChild(pop);
+    document.body.appendChild(pop);
   }
 
+  return {
+    favNavItem,
+    badge,
+    pop,
+    favList: pop.querySelector('.fav-list'),
+    emptyMsg: pop.querySelector('.empty'),
+    closeBtn: pop.querySelector('.close-pop')
+  };
+}
+
+  // retorna o contexto (mantendo nomes usados por outras funções)
   return { favNavItem, badge, pop, favList: pop.querySelector('.fav-list'), emptyMsg: pop.querySelector('.empty'), closeBtn: pop.querySelector('.close-pop') };
 }
 
-/* ======= RENDER POPUP ======= */
-function renderPopoverContents(context){
-  if(!context) return;
-  const userId = getUserId();
-  const favs = loadFavArr(userId);
-  const { badge, favList, emptyMsg } = context;
-  badge.textContent = favs.length > 0 ? String(favs.length) : '';
-  favList.innerHTML = '';
-  if(!favs.length){
-    emptyMsg.style.display = 'block';
-    favList.style.display = 'none';
-    return;
-  }
-  emptyMsg.style.display = 'none';
-  favList.style.display = 'flex';
-  favs.forEach(id=>{
-    const md = metadataFor(id);
-    const item = document.createElement('div');
-    item.className = 'fav-item';
-    item.setAttribute('role','listitem');
-    item.innerHTML = `
-      <div class="thumb">${md.thumb ? `<img src="${md.thumb}" alt="${md.title}">` : `<i class='bx bxs-star' style="font-size:20px;opacity:.9"></i>`}</div>
-      <div class="meta">
-        <div class="title">${md.title}</div>
-        <div class="sub">${id}</div>
-      </div>`;
-    item.addEventListener('click', (e)=>{
-      e.preventDefault();
-      if(md.href && md.href !== '#') window.open(md.href, '_blank');
-      // close popover
-      context.pop.classList.remove('open');
-    });
-    favList.appendChild(item);
-  });
-}
-
-/* ======= SHOW/HIDE POPOVER ======= */
 function showPopover(context){
   if(!context) return;
   renderPopoverContents(context);
-  context.pop.classList.add('open');
-  const rect = context.favNavItem.getBoundingClientRect();
-  const popRect = context.pop.getBoundingClientRect();
-  const viewportW = window.innerWidth;
-  let left = rect.left + rect.width/2 - popRect.width/2;
-  left = Math.max(8, Math.min(left, viewportW - popRect.width - 8));
-  const favRect = context.favNavItem.getBoundingClientRect();
-  context.pop.style.left = `${left - favRect.left + context.favNavItem.clientWidth/2}px`;
+  context.pop.classList.add('open');         // ativa transform: translateX(0)
+  document.body.classList.add('fav-drawer-open'); // opcional: desabilita scroll body
+  // foco acessível
+  context.pop.setAttribute('aria-hidden','false');
+  context.pop.querySelector('.close-pop')?.focus();
 }
-function hidePopover(context){ if(context) context.pop.classList.remove('open'); }
 
+function hidePopover(context){
+  if(!context) return;
+  context.pop.classList.remove('open');
+  document.body.classList.remove('fav-drawer-open');
+  context.pop.setAttribute('aria-hidden','true');
+}
 function markFavButtonsUI(){
   const userId = getUserId();
   const favs = new Set(loadFavArr(userId));
@@ -2089,8 +2097,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     console.warn('Fav module: nav pill não encontrada — favoritos desativados.');
     return;
   }
-  ctx.pop = ctx.pop;
-  ctx.favNavItem = ctx.favNavItem || document.querySelector('.modern-navbar .nav-item[data-action="favorites"]') || document.querySelector('.modern-navbar .nav-item');
 
   document.addEventListener('click', (e)=>{
     const btn = e.target.closest('.fav-btn');
@@ -2230,62 +2236,23 @@ document.addEventListener('DOMContentLoaded', ()=>{
     .robot-base, .robot-head { animation: none; transition: none; }
   }
   /* Gradiente animado no texto */
-.logo-text-main.blank { 
-  font-weight: 900;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, #321be1, #41B96F, #e71b1b, #FFB300, #111cad);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: ct-gradient 3s linear infinite;
+@media (max-width: 768px) {
+    .search-container {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+    #toolSearch {
+        width: 100% !important;
+    }
 }
-
 @keyframes ct-gradient {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .logo-text-main.blank { animation: none; background-size: auto; color: #1df70a; -webkit-background-clip: unset; background-clip: unset; } 
-}
 /* Borda animada ao redor do título */
-.logo-text-main.animated {
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-  border-radius: 12px;
-  padding: 6px 12px; /* espaço para o glow */
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.logo-text-main.animated::before{
-  content: "";
-  position: absolute;
-  inset: -10px;                 /* controla espessura do anel */
-  z-index: -2;
-  border-radius: 10px;
-  background: linear-gradient(90deg, rgba(127, 76, 255, 0.95), rgba(255,179,0,0.95), rgba(36, 5, 238, 0.95));
-  filter: blur(294px);           /* espalha o glow */
-  opacity: 0.5;
-  pointer-events: none;
-  transform: translateZ(0);
-  animation: ct-border-move 2s linear infinite;
-}
-
-.logo-text-main.animated::after{
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: 12px;
-  background: radial-gradient(circle at 30% 30%, rgba(65,185,111,0.14), transparent 30%),
-              radial-gradient(circle at 70% 60%, rgba(255,179,0,0.12), transparent 30%);
-  filter: blur(116px);
-  pointer-events: none;
-  opacity: 1;
-}
 
 /* animação do gradiente */
 @keyframes ct-border-move {
@@ -2295,16 +2262,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 }
 
 
-@media (prefers-reduced-motion: reduce) {
-  .logo-text-main.animated::after { animation: none; filter: blur(2px); }
-}
 
 </style>
 
 <div class="robot-corner" id="robotCorner" aria-hidden="false" title="Robô Control Tower">
   <div class="robot-card" id="robotCard">
-    <img class="robot-base" id="robotBase" src="https://i.ibb.co/NdN67DT5/image.png" alt="Robô">
-    <img class="robot-head" id="robotHead" src="https://i.ibb.co/NdN67DT5/image.png" alt="" aria-hidden="true">
+    <img class="robot-base" id="robotBase" src="https://i.ibb.co/mr26t2Kt/image.png" alt="Robô">
+    <img class="robot-head" id="robotHead" src="https://i.ibb.co/mr26t2Kt/image.png" alt="" aria-hidden="true">
     <div class="robot-glow" aria-hidden="true"></div>
   </div>
 </div>
@@ -2425,6 +2389,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
 <script>
 
 
@@ -2479,38 +2444,13 @@ document.addEventListener('DOMContentLoaded', function() {
     replicateOnce();
   }
 
-  document.addEventListener('click', function (e) {
-    const navBtn = e.target.closest('.modern-navbar .nav-item');
-    if (!navBtn) return;
-    setTimeout(replicateOnce, 50);
-  });
+  
+  
 
   window.__replicateHomeBg = replicateOnce;
 })();
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // seletor do botão que queremos ativar por padrão
-  const defaultNav = document.querySelector('.modern-navbar .nav-item[data-content-id="controles"]');
-  if (defaultNav && typeof activateNavItem === 'function') {
-    // usa a função existente para garantir que tudo seja atualizado (classes, aria, conteúdo)
-    activateNavItem(defaultNav);
-  } else if (defaultNav) {
-    // fallback: aplica classes e mostra a seção manualmente
-    document.querySelectorAll('.modern-navbar .nav-item').forEach(n => {
-      n.classList.remove('active');
-      n.setAttribute('aria-selected', 'false');
-    });
-    defaultNav.classList.add('active');
-    defaultNav.setAttribute('aria-selected', 'true');
 
-    // mostra/esconde seções (IDs no HTML: idea-content, controles-content, outros-content)
-    document.getElementById('idea-content')?.classList.add('hidden');
-    document.getElementById('outros-content')?.classList.add('hidden');
-    document.getElementById('controles-content')?.classList.remove('hidden');
-  }
-});
-</script>
 <style>
 /* Modal básico e responsivo */
 .bio-modal {
@@ -2560,6 +2500,7 @@ document.addEventListener('DOMContentLoaded', function() {
   border-radius: 8px;
   object-fit: cover;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  border: 6px solid #ffb300;
 }
 
 @media (max-width: 900px) { .bio-avatar { width: 100%; height: auto; max-height: 420px; } }
@@ -2675,12 +2616,340 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('keydown', (e)=>{
     if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
   });
+  // Sidebar behavior: ativação de links, colapso e integração com showContent()
+(function(){
+  const sidebar = document.getElementById('mainSidebar');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const links = sidebar.querySelectorAll('.nav-link');
+
+  function activateLink(el) {
+    links.forEach(l=>l.classList.remove('active'));
+    el.classList.add('active');
+    const cid = el.dataset.contentId;
+    if(cid && typeof showContent === 'function') {
+      showContent(cid);
+    } else if(el.dataset.action === 'docs') {
+      alert('Funcionalidade de Documentação em breve!');
+    } else if(el.dataset.action === 'favorites') {
+      // reutiliza popover que já tens: dispara clique no nav-item original (se existir)
+      
+    }
+  }
+
+  links.forEach(link=>{
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      activateLink(this);
+    });
+  });
+
+  // colapso
+  collapseBtn.addEventListener('click', function(){
+    sidebar.classList.toggle('collapsed');
+    document.querySelector('.page-container')?.classList.toggle('compact');
+    // se usa main-with-sidebar classe para margin, alterna lá também:
+    document.querySelector('.page-container')?.classList.toggle('main-with-sidebar');
+  });
+
+  // aplica classe inicial para empurrar o conteúdo
+  document.querySelector('.page-container')?.classList.add('main-with-sidebar');
+
+  // mobile: abrir fechando com swipe/toggle (opcional)
+  // expor globalmente se necessário
+  window.__CT_sidebar = { activateLink };
 })();
 
+})();
+</script>
+<script>
+(function(){
+  const userId = window.__CURRENT_USER_ID__ || null;
+  const storageKey = (id) => `ct_favorites_${id || 'anon'}`;
+
+  function loadFavArr(){ try { return JSON.parse(localStorage.getItem(storageKey(userId)) || '[]'); } catch(e){ return []; } }
+  function saveFavArr(arr){ try { localStorage.setItem(storageKey(userId), JSON.stringify(Array.from(new Set(arr)))); } catch(e){} }
+
+  function ensureFavUI(){
+    const sidebarFavLink = document.querySelector('.sidebar .nav-link[data-action="favorites"]');
+    if(!sidebarFavLink) return null;
+
+    // badge
+    let badge = sidebarFavLink.querySelector('.nav-fav-badge');
+    if(!badge){
+      badge = document.createElement('span');
+      badge.className = 'nav-fav-badge';
+      badge.textContent = '';
+      sidebarFavLink.style.position = 'relative';
+      sidebarFavLink.appendChild(badge);
+    }
+
+    // drawer/popover
+   
+let pop = document.querySelector('.fav-popover.fav-sidebar-left');
+if(!pop){
+  pop = document.createElement('div');
+  pop.className = 'fav-popover fav-sidebar-left';
+  pop.innerHTML = `
+    <div class="header">
+      <h4 style="margin:0;color:#fff;font-size:0.95rem">Meus Favoritos</h4>
+      <button class="close-pop" aria-label="Fechar" title="Fechar" style="background:transparent;border:none;color:#cfcfd3;font-weight:700;cursor:pointer">✕</button>
+    </div>
+    <div class="fav-list" role="list"></div>
+    <div class="empty" style="display:none">Você ainda não favoritou nenhum item.</div>
+  `;
+  // anexa DENTRO da sidebar, logo após o link de favoritos (mantém contexto visual)
+  const sidebar = document.getElementById('mainSidebar') || document.querySelector('.sidebar');
+  if(sidebar){
+    // garante que a sidebar seja referência para posicionamento absoluto
+    if(getComputedStyle(sidebar).position === 'static') sidebar.style.position = 'relative';
+    sidebar.appendChild(pop);
+  } else {
+    // fallback: anexa no body se a sidebar não for encontrada
+    document.body.appendChild(pop);
+    // (neste caso o CSS da versão desktop ainda serve)
+  }
+}
+
+
+    return { sidebarFavLink, badge, pop, favList: pop.querySelector('.fav-list'), emptyMsg: pop.querySelector('.empty'), closeBtn: pop.querySelector('.close-pop') };
+  }
+
+  const ctx = ensureFavUI();
+  if(!ctx){ console.warn('Favoritos: link na sidebar não encontrado.'); return; }
+
+  function metadataFor(dashId){
+    const card = document.querySelector(`.tool-card[data-dash-id="${CSS.escape ? CSS.escape(dashId) : dashId}"]`) ||
+                 document.querySelector(`.tool-card[data-name="${dashId}"]`);
+    const title = card?.querySelector('.tool-card-title a')?.textContent?.trim() || card?.dataset.name || dashId;
+    const href = card?.querySelector('.tool-card-title a')?.href || '#';
+    let thumb = null;
+    if (typeof ICON_MAP !== 'undefined') thumb = ICON_MAP[card?.dataset.name] || ICON_MAP[dashId] || null;
+    if(!thumb){
+      const img = card?.querySelector('.tool-card-img');
+      if(img && img.src) thumb = img.src;
+    }
+    return { title, href, thumb };
+  }
+
+  function renderPopoverContents(){
+    const arr = loadFavArr();
+    ctx.favList.innerHTML = '';
+    if(!arr.length){
+      ctx.emptyMsg.style.display = 'block';
+      ctx.favList.style.display = 'none';
+    } else {
+      ctx.emptyMsg.style.display = 'none';
+      ctx.favList.style.display = 'flex';
+      arr.forEach(id => {
+        const meta = metadataFor(id);
+        const item = document.createElement('div');
+        item.className = 'fav-item';
+        item.style.display = 'flex';
+        item.style.gap = '10px';
+        item.style.alignItems = 'center';
+        item.style.padding = '8px 6px';
+        item.innerHTML = `
+          <img src="${meta.thumb||'https://i.ibb.co/LDWzCjyv/image.png'}" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:cover">
+          <div style="flex:1;min-width:0">
+            <a href="${meta.href}" target="_blank" rel="noopener noreferrer" style="font-weight:700;color:#fff;text-decoration:underline">${meta.title}</a>
+          </div>
+          <button class="fav-item-remove" title="Remover" data-id="${id}" style="background:transparent;border:none;color:#fff;font-weight:700;cursor:pointer">✕</button>
+        `;
+        ctx.favList.appendChild(item);
+      });
+    }
+    ctx.badge.textContent = arr.length ? String(arr.length) : '';
+  }
+
+  function markFavButtonsUI(){
+    const favs = new Set(loadFavArr());
+    document.querySelectorAll('.fav-btn').forEach(btn=>{
+      const id = btn.dataset.dashId;
+      if(!id) return;
+      const isFav = favs.has(id);
+      btn.classList.toggle('active', isFav);
+      btn.setAttribute('aria-pressed', String(Boolean(isFav)));
+    });
+    ctx.badge.textContent = favs.size ? String(favs.size) : '';
+  }
+
+  function toggleFavorite(dashId){
+    const arr = loadFavArr();
+    const idx = arr.indexOf(dashId);
+    if(idx === -1) arr.push(dashId); else arr.splice(idx,1);
+    saveFavArr(arr);
+    markFavButtonsUI();
+    renderPopoverContents();
+  }
+
+function showPopover(){
+  renderPopoverContents();
+
+  // se estamos na versão "sidebar-left", posiciona o pop abaixo do link
+  if(ctx && ctx.pop && ctx.sidebarFavLink && ctx.pop.classList.contains('fav-sidebar-left')){
+    // obter distância do link dentro da sidebar
+    const linkRect = ctx.sidebarFavLink.getBoundingClientRect();
+    const sidebarRect = ctx.sidebarFavLink.closest('.sidebar')?.getBoundingClientRect();
+    // calcula top relativo à sidebar: offset do link mais a altura do link + pequeno padding
+    let topPx = 0;
+    if(sidebarRect){
+      topPx = (linkRect.bottom - sidebarRect.top) + 6; // +6px de folga
+      // aplica como estilo inline (pos absolute relative à sidebar)
+      ctx.pop.style.top = topPx + 'px';
+      ctx.pop.style.left = '0px';
+    } else {
+      // fallback para caso não esteja dentro da sidebar
+      ctx.pop.style.top = '';
+      ctx.pop.style.left = '';
+    }
+
+    ctx.pop.classList.add('open');
+    // não desabilitar scroll global (está dentro da sidebar)
+    ctx.pop.setAttribute('aria-hidden','false');
+    ctx.closeBtn?.focus();
+    return;
+  }
+
+  // comportamento original caso pop esteja no body / direita
+  if(ctx && ctx.pop){
+    ctx.pop.classList.add('open');
+    document.body.classList.add('fav-drawer-open');
+    ctx.pop.setAttribute('aria-hidden','false');
+    ctx.closeBtn?.focus();
+  }
+}
+
+function hidePopover(){
+  if(!ctx || !ctx.pop) return;
+  ctx.pop.classList.remove('open');
+  // apenas remove classe global se estivermos usando a versão 'drawer' no body
+  if(ctx.pop.classList.contains('fav-sidebar')) document.body.classList.remove('fav-drawer-open');
+  ctx.pop.setAttribute('aria-hidden','true');
+}
+
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.fav-btn');
+    if(btn){
+      e.stopPropagation();
+      const id = btn.dataset.dashId;
+      if(!id) return console.warn('fav-btn sem data-dash-id');
+      toggleFavorite(id);
+      return;
+    }
+    const rem = e.target.closest('.fav-item-remove');
+    if(rem){
+      const id = rem.dataset.id;
+      if(id) toggleFavorite(id);
+      return;
+    }
+  });
+
+  ctx.sidebarFavLink.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    if(ctx.pop.classList.contains('open')) hidePopover();
+    else showPopover();
+  });
+
+  ctx.closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); hidePopover(); });
+  document.addEventListener('click', (e)=>{
+    if(!ctx.pop.contains(e.target) && !ctx.sidebarFavLink.contains(e.target)) hidePopover();
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') hidePopover(); });
+
+  function injectFavButtonsAll(){
+    document.querySelectorAll('.tool-card').forEach(card=>{
+      let dashId = card.getAttribute('data-dash-id') || (card.dataset.name ? String(card.dataset.name).toLowerCase().trim().replace(/\s+/g,'_').replace(/[^a-z0-9_\-]/g,'') : '');
+      if(!dashId) return;
+      card.setAttribute('data-dash-id', dashId);
+      const wrapper = card.querySelector('.tool-card-icon-wrapper');
+      if(!wrapper) return;
+      if(!wrapper.querySelector(`.fav-btn[data-dash-id="${dashId}"]`)){
+        const btn = document.createElement('button');
+        btn.className = 'fav-btn';
+        btn.type = 'button';
+        btn.title = 'Favoritar';
+        btn.setAttribute('aria-pressed','false');
+        btn.dataset.dashId = dashId;
+        btn.innerHTML = "<i class='bx bxs-star'></i>";
+        wrapper.appendChild(btn);
+      }
+    });
+  }
+
+  injectFavButtonsAll();
+  markFavButtonsUI();
+
+  // Expose for debugging if necessário
+  window.__CT_fav = { injectFavButtonsAll, loadFavArr, saveFavArr, toggleFavorite, showPopover, hidePopover, renderPopoverContents };
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // Esconde as outras seções
+  document.getElementById('idea-content')?.classList.add('hidden');
+  document.getElementById('outros-content')?.classList.add('hidden');
+  // Mostra controles
+  document.getElementById('controles-content')?.classList.remove('hidden');
+
+  // Marca na sidebar
+  document.querySelectorAll('.sidebar .nav-link').forEach(l=> l.classList.remove('active'));
+  const s = document.querySelector('.sidebar .nav-link[data-content-id="controles"]');
+  if (s) s.classList.add('active');
+
+  // Marca no modern-navbar (se existir)
+  document.querySelectorAll('.modern-navbar .nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.setAttribute('aria-selected','false');
+  });
+  const mn = document.querySelector('.modern-navbar .nav-item[data-content-id="controles"]');
+  if (mn) { mn.classList.add('active'); mn.setAttribute('aria-selected','true'); }
+});
+
+</script>
+<script>
+  // Insira este bloco ANTES do </body>
+  (function(){
+    /**
+     * setFavicon(url)
+     * - remove links atuais de favicon e insere o novo
+     * - adiciona cache-bust para forçar atualização (evita o cache do navegador)
+     */
+    function setFavicon(url) {
+      if (!url) return;
+      // remove quaisquer favicons existentes
+      document.querySelectorAll("link[rel*='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']").forEach(n => n.remove());
+
+      // cria link padrão (png)
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.type = url.endsWith('.ico') ? 'image/x-icon' : 'image/png';
+      // adiciona ?v=timestamp para evitar cache (tire se não quiser)
+      link.href = url + (url.indexOf('?') === -1 ? ('?v=' + Date.now()) : ('&v=' + Date.now()));
+      document.head.appendChild(link);
+
+      // opcional: adiciona fallback shortcut icon para browsers antigos
+      const shortcut = document.createElement('link');
+      shortcut.rel = 'shortcut icon';
+      shortcut.type = 'image/x-icon';
+      shortcut.href = link.href;
+      document.head.appendChild(shortcut);
+    }
+
+    // --- USO: substitua pela URL do seu novo favicon ---
+    // Recomendo 32x32 ou 48x48 PNG, ou um .ico multi-size.
+    const NEW_FAV_URL = 'https://i.ibb.co/XZGKX5pF/image.png';
+
+    // Executa quando o DOM estiver pronto
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setFavicon(NEW_FAV_URL));
+    } else {
+      setFavicon(NEW_FAV_URL);
+    }
+  })();
 </script>
 
 </body>
 </html>
-
 
 
